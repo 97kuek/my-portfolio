@@ -2,6 +2,7 @@
 title: 'Astroとは？: ポートフォリオサイトにAstroを選んだ理由'
 description: '新世代の静的サイトジェネレーター「Astro」の特徴と、アイランドアーキテクチャについて解説します。'
 pubDate: '2025-12-16'
+heroImage: '../../assets/astro.png'
 tags: ['Astro', 'Web開発', '技術解説']
 ---
 
@@ -29,7 +30,7 @@ Astro の技術的な面白さは、**「必要な部分だけを動的にハイ
 
 ** client:load ** ディレクティブを付与したコンポーネントのみが、ブラウザ上で JavaScript として機能します。「静的なHTMLの大海原」の中に、「動的なコンポーネントの島」が浮かんでいるイメージです。これにより、高いパフォーマンスとリッチなUIを両立させています。
 
-####3. "Bring Your Own Framework" (UIにとらわれない)
+#### 3. "Bring Your Own Framework" (UIにとらわれない)
 Astro は独自の .astro ファイルを使用しますが、その内部で React, Vue, Svelte といった既存のUIライブラリを自由に利用可能です。
 私は Web 開発の学習として React (Next.js) にも関心がありますが、Astro であれば「ベースは軽量な Astro で組み、複雑な状態管理が必要な UI だけ React を使う」という適材適所の技術選定が可能です。 特定のフレームワークにロックインされない柔軟性も、採用の大きな決め手でした。
 
