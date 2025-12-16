@@ -1,98 +1,233 @@
 ---
 import Layout from '../layouts/BlogPost.astro';
+
+// 自分のプロフィール画像があればここで指定（なければプレースホルダーのままでOK）
+const heroImage = "/blog-placeholder-about.jpg";
 ---
 
 <Layout
 	title="About Me"
 	description="植木敬太郎のポートフォリオ"
 	pubDate={new Date('2025-12-16')}
-	heroImage="/blog-placeholder-about.jpg"
+	heroImage={heroImage}
 >
-	<p class="intro">
-		早稲田大学 基幹理工学部 情報通信学科 2年。<br>
-		エンジニアリングとものづくりが好きです。
-	</p>
+	<div class="intro-section">
+		<p class="lead">
+			早稲田大学 基幹理工学部 情報通信学科 2年。<br>
+			<strong>「エンジニアリング」と「ものづくり」</strong>が好きです。<br>
+			数値解析からWeb開発まで、興味の幅を広げながら技術を磨いています。
+		</p>
+	</div>
 
-	<hr />
+	<hr class="divider" />
 
-	<h2>Background</h2>
-	<p>
-		<strong>人力飛行機製作サークル「WASA」</strong>の翼班に所属。<br>
-		鳥人間コンテスト出場を目指し、日々主翼や尾翼の製作に励んでいます。
-	</p>
+	<div class="content-block">
+		<h2>Activities</h2>
+		<p>
+			<strong>早稲田大学宇宙航空研究会 (WASA) 鳥人間プロジェクト</strong><br>
+			43代 翼班所属。<br>
+			鳥人間コンテスト出場を目指し、人力飛行機の主翼・尾翼の設計製作に励んでいます。<br>
+			空力解析や構造計算など、理論と実践の両面から航空工学に触れています。
+		</p>
+	</div>
 
-	<h2>Skills & Interests</h2>
-	<p>数値解析や画像処理、3Dモデリングの自動化などを中心に扱っています。</p>
-	<ul>
-		<li><strong>Languages:</strong> Python, MATLAB, C/C++</li>
-		<li><strong>Engineering & Design:</strong> Blender API (Python scripting), OpenCV</li>
-		<li><strong>Web Development:</strong> Astro, Next.js (Learning)</li>
-	</ul>
-
-	<h2>Education</h2>
-	<ul class="timeline">
-		<li>
-			<span class="date">2025.04 - Current</span>
-			<div class="content">
-				<strong>早稲田大学 基幹理工学部 情報通信学科</strong><br>
-				<span class="detail">通信工学・情報工学を中心に専攻</span>
+	<div class="content-block">
+		<h2>🛠 Skills & Interests</h2>
+		<p>数値解析、画像処理、3Dモデリングの自動化などを中心に扱っています。</p>
+		
+		<div class="skill-grid">
+			<div class="skill-category">
+				<h3>Languages</h3>
+				<div class="tags">
+					<span class="tag">Python</span>
+					<span class="tag">MATLAB</span>
+					<span class="tag">C / C++</span>
+					<span class="tag">SQL</span>
+				</div>
 			</div>
-		</li>
-		<li>
-			<span class="date">2024.04 - 2025.03</span>
-			<div class="content">
-				<strong>早稲田大学 基幹理工学部 学系Ⅱ</strong><br>
-				<span class="detail">1年次は学科に所属せず、成績に応じて2年生から学科に所属します</span>
+
+			<div class="skill-category">
+				<h3>Engineering & Design</h3>
+				<div class="tags">
+					<span class="tag">Blender API</span>
+					<span class="tag">OpenCV</span>
+					<span class="tag">XFLR5</span>
+					<span class="tag">Fusion360</span>
+				</div>
 			</div>
-		</li>
-		<li>
-			<span class="date">2018.04 - 2024.03</span>
-			<div class="content">
-				<strong>桐蔭学園中等教育学校</strong>
+
+			<div class="skill-category">
+				<h3>Web Development</h3>
+				<div class="tags">
+					<span class="tag">Astro</span>
+					<span class="tag">HTML/CSS</span>
+					<span class="tag">Git/GitHub</span>
+					<span class="tag">Next.js (Learning)</span>
+				</div>
 			</div>
-		</li>
-	</ul>
+		</div>
+	</div>
+
+	<div class="content-block">
+		<h2>Education</h2>
+		<ul class="timeline">
+			<li class="timeline-item current">
+				<div class="timeline-marker"></div>
+				<div class="timeline-content">
+					<span class="date">2025.04 - Current</span>
+					<h3>早稲田大学 基幹理工学部 情報通信学科</h3>
+					<p class="detail">通信工学・情報工学・信号処理を中心に専攻。</p>
+				</div>
+			</li>
+			<li class="timeline-item">
+				<div class="timeline-marker"></div>
+				<div class="timeline-content">
+					<span class="date">2024.04 - 2025.03</span>
+					<h3>早稲田大学 基幹理工学部 学系Ⅱ</h3>
+					<p class="detail">1年次は基礎工学全般を学習。成績選抜を経て情報通信学科へ配属。</p>
+				</div>
+			</li>
+			<li class="timeline-item">
+				<div class="timeline-marker"></div>
+				<div class="timeline-content">
+					<span class="date">2018.04 - 2024.03</span>
+					<h3>桐蔭学園中等教育学校</h3>
+					<p class="detail">中高一貫課程修了</p>
+				</div>
+			</li>
+		</ul>
+	</div>
 
 </Layout>
 
 <style>
-	/* 簡単なスタイル調整 */
-	.intro {
+	/* 全体の文字調整 */
+	.intro-section {
+		margin-bottom: 2rem;
+	}
+	.lead {
 		font-size: 1.1em;
 		line-height: 1.8;
 		color: #333;
 	}
+	.divider {
+		border: 0;
+		border-top: 1px solid #eee;
+		margin: 2rem 0;
+	}
+
+	.content-block {
+		margin-bottom: 3rem;
+	}
+	h2 {
+		/* 見出しのデザイン強化 */
+		font-size: 1.6em;
+		border-bottom: 2px solid var(--accent); /* 下線をアクセントカラーに */
+		padding-bottom: 0.3rem;
+		margin-bottom: 1.5rem;
+		display: inline-block;
+	}
+
+	/* --- スキルタグのデザイン --- */
+	.skill-grid {
+		display: grid;
+		gap: 1.5rem;
+	}
+	.skill-category h3 {
+		font-size: 1rem;
+		color: #666;
+		margin-bottom: 0.5rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+	.tag {
+		background: #f4f4f5;
+		color: #333;
+		padding: 0.3rem 0.8rem;
+		border-radius: 6px;
+		font-size: 0.9rem;
+		font-weight: 500;
+		border: 1px solid #e0e0e0;
+		transition: all 0.2s;
+	}
+	.tag:hover {
+		background: var(--accent);
+		color: #fff;
+		border-color: var(--accent);
+		transform: translateY(-2px);
+	}
+
+	/* --- タイムラインのデザイン --- */
 	.timeline {
 		list-style: none;
 		padding: 0;
-		border-left: 2px solid #ddd;
-		margin-left: 1rem;
-	}
-	.timeline li {
-		margin-bottom: 2rem;
-		padding-left: 1.5rem;
+		margin: 0;
 		position: relative;
 	}
-	.timeline li::before {
+	/* 左側の縦線 */
+	.timeline::before {
 		content: '';
-		width: 12px;
-		height: 12px;
-		background: #fff;
-		border: 2px solid #333;
-		border-radius: 50%;
 		position: absolute;
-		left: -7px;
-		top: 5px;
+		top: 0;
+		bottom: 0;
+		left: 7px; /* 丸の中心に合わせる */
+		width: 2px;
+		background: #eee;
+	}
+
+	.timeline-item {
+		position: relative;
+		padding-left: 2.5rem; /* 左のスペース確保 */
+		margin-bottom: 2rem;
+	}
+
+	/* タイムラインの丸ポチ */
+	.timeline-marker {
+		position: absolute;
+		left: 0;
+		top: 5px; /* テキストの上端に合わせる */
+		width: 16px;
+		height: 16px;
+		background: #fff;
+		border: 3px solid #ccc;
+		border-radius: 50%;
+		z-index: 1;
+		transition: border-color 0.3s;
+	}
+	/* 現在（最新）のステータスだけ色を変える */
+	.timeline-item.current .timeline-marker {
+		border-color: var(--accent);
+		background: var(--accent-light);
+	}
+	/* ホバー時に丸の色を変える */
+	.timeline-item:hover .timeline-marker {
+		border-color: var(--accent);
+	}
+
+	.timeline-content h3 {
+		margin: 0 0 0.3rem 0;
+		font-size: 1.1rem;
+		line-height: 1.4;
 	}
 	.date {
-		display: block;
+		display: inline-block;
 		font-size: 0.85rem;
 		font-weight: bold;
-		color: #666;
-		margin-bottom: 0.2rem;
+		color: var(--accent);
+		margin-bottom: 0.3rem;
+		background: rgba(var(--gray), 0.1);
+		padding: 0.1rem 0.5rem;
+		border-radius: 4px;
 	}
 	.detail {
-		font-size: 0.9rem;
+		font-size: 0.95rem;
 		color: #555;
+		margin: 0;
+		line-height: 1.6;
 	}
 </style>

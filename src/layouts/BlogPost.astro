@@ -14,21 +14,29 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
+
 		<style>
 			main {
 				width: calc(100% - 2em);
 				max-width: 100%;
 				margin: 0;
 			}
+
+			/* アイキャッチ画像の設定 */
 			.hero-image {
-				width: 100%;
+				width: 720px;
+				max-width: 100%;
+				margin: 0 auto 2em auto;
 			}
 			.hero-image img {
 				display: block;
 				margin: 0 auto;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
+				height: auto;
 			}
+
+			/* --- 記事本文エリアの設定 --- */
 			.prose {
 				width: 720px;
 				max-width: calc(100% - 2em);
@@ -36,8 +44,58 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				padding: 1em;
 				color: rgb(var(--gray-dark));
 				font-size: 16px;
-				line-height: 1.5;
+				line-height: 1.7;
 			}
+
+			/* 見出し設定 */
+			.prose h1 {
+				font-size: 1.8em;
+				margin-top: 1.5em;
+			}
+			.prose h2 {
+				font-size: 1.5em;
+				margin-top: 2em;
+				margin-bottom: 0.8em;
+				/* ダークモードでも眩しくないように、不透明度を使った色に修正 */
+				border-bottom: 1px solid rgba(var(--gray), 0.25);
+				padding-bottom: 0.3em;
+			}
+			.prose h3 {
+				font-size: 1.25em;
+				margin-top: 1.5em;
+				margin-bottom: 0.5em;
+			}
+
+			/* 引用（blockquote）のデザインを追加 */
+			.prose blockquote {
+				border-left: 4px solid rgb(var(--accent)); /* 左にアクセントカラーの線 */
+				padding-left: 1em;
+				color: rgb(var(--gray));
+				font-style: italic;
+				margin: 1.5em 0;
+				background: rgba(var(--gray), 0.05); /* うっすら背景色 */
+				padding: 0.5em 1em;
+				border-radius: 0 4px 4px 0;
+			}
+
+			/* 画像・動画 */
+			.prose img, .prose video {
+				max-width: 100%;
+				height: auto;
+				border-radius: 8px;
+				margin: 1.5em 0; /* 画像の上下に少し余白 */
+			}
+            
+            /* リスト（箇条書き）が詰まって見えないように調整 */
+            .prose ul, .prose ol {
+                margin-bottom: 1.5em;
+                padding-left: 1.5em;
+            }
+            .prose li {
+                margin-bottom: 0.5em;
+            }
+
+			/* --- タイトルエリア --- */
 			.title {
 				margin-bottom: 1em;
 				padding: 1em 0;
@@ -45,6 +103,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				line-height: 1;
 			}
 			.title h1 {
+				font-size: 2rem;
 				margin: 0 0 0.5em 0;
 			}
 			.date {
@@ -62,7 +121,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<main>
 			<article>
 				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" loading="eager" />}
 				</div>
 				<div class="prose">
 					<div class="title">
