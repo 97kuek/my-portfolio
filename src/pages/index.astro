@@ -5,8 +5,6 @@ import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
-
-// ★ここに自分のプロフィール画像のパスを指定
 import profileImage from '../assets/profile.jpg';
 
 // ブログ記事を取得し、新しい順に並べ替えて「最新の3件」だけ取り出す
@@ -25,7 +23,7 @@ const posts = (await getCollection('blog')).sort(
 		<main>
 			<div class="hero-container">
 				<div class="hero-content">
-					<span class="greeting">Hello, I'm Keitaro.</span>
+					<span class="greeting">Hello, I'm 97kuek_.</span>
 					
 					<div class="typewriter-container">
 						<span class="fixed-text">I'm a </span>
@@ -36,7 +34,7 @@ const posts = (await getCollection('blog')).sort(
 					<h1>Web Dev &<br/>Engineering</h1>
 					<p class="bio">
 						早稲田大学 基幹理工学部 情報通信学科 2年<br/>
-						<strong>植木 敬太郎 (Keitaro Ueki)</strong>
+						<strong>97kuek_</strong>
 					</p>
 					<p class="description">
 						人力飛行機・数値解析・ガジェットが好き。<br/>
@@ -53,7 +51,7 @@ const posts = (await getCollection('blog')).sort(
 					<div class="image-wrapper">
 						<Image 
 							src={profileImage} 
-							alt="Keitaro Ueki" 
+							alt="97kuek_" 
 							width={280} 
 							height={280} 
 							class="profile-img" 
