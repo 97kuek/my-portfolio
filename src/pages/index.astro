@@ -6,13 +6,13 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 
+// ★ここに自分のプロフィール画像のパスを指定
+import profileImage from '../assets/profile.jpg';
+
 // ブログ記事を取得し、新しい順に並べ替えて「最新の3件」だけ取り出す
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 ).slice(0, 3);
-
-// ★ここに自分のプロフィール画像のパスを指定（なければコメントアウトのままでOK）
-// import profileImage from '../assets/profile.jpg';
 ---
 
 <!doctype html>
@@ -26,6 +26,13 @@ const posts = (await getCollection('blog')).sort(
 			<div class="hero-container">
 				<div class="hero-content">
 					<span class="greeting">Hello, I'm Keitaro.</span>
+					
+					<div class="typewriter-container">
+						<span class="fixed-text">I'm a </span>
+						<span id="typewriter-text" class="typing-text"></span>
+						<span class="cursor">|</span>
+					</div>
+
 					<h1>Web Dev &<br/>Engineering</h1>
 					<p class="bio">
 						早稲田大学 基幹理工学部 情報通信学科 2年<br/>
@@ -43,8 +50,15 @@ const posts = (await getCollection('blog')).sort(
 				</div>
 				
 				<div class="hero-visual">
-					<div class="placeholder-shape">
-						<div class="circle"></div>
+					<div class="image-wrapper">
+						<Image 
+							src={profileImage} 
+							alt="Keitaro Ueki" 
+							width={280} 
+							height={280} 
+							class="profile-img" 
+							loading="eager"
+						/>
 					</div>
 				</div>
 			</div>
@@ -77,13 +91,56 @@ const posts = (await getCollection('blog')).sort(
 			</section>
 		</main>
 		<Footer />
+
+		<script>
+			const phrases = [
+				"Waseda University Student",
+				"full-stack engineer",
+				"MATLAB enthusiast"
+			];
+			
+			const textElement = document.getElementById('typewriter-text');
+			let phraseIndex = 0;
+			let charIndex = 0;
+			let isDeleting = false;
+			let typeSpeed = 100; // 打つ速度
+
+			function type() {
+				const currentPhrase = phrases[phraseIndex];
+				
+				if (isDeleting) {
+					textElement.textContent = currentPhrase.substring(0, charIndex - 1);
+					charIndex--;
+					typeSpeed = 50; // 消す速度
+				} else {
+					textElement.textContent = currentPhrase.substring(0, charIndex + 1);
+					charIndex++;
+					typeSpeed = 100; // 打つ速度
+				}
+
+				if (!isDeleting && charIndex === currentPhrase.length) {
+					// 打ち終わったら少し待機
+					isDeleting = true;
+					typeSpeed = 2000;
+				} else if (isDeleting && charIndex === 0) {
+					// 消し終わったら次の言葉へ
+					isDeleting = false;
+					phraseIndex = (phraseIndex + 1) % phrases.length;
+					typeSpeed = 500;
+				}
+
+				setTimeout(type, typeSpeed);
+			}
+
+			document.addEventListener('DOMContentLoaded', type);
+		</script>
 	</body>
 </html>
 
 <style>
 	/* 全体のレイアウト調整 */
 	main {
-		width: 960px; /* 少し幅を広げる */
+		width: 960px;
 		max-width: calc(100% - 2em);
 		margin: 0 auto;
 		padding: 2em 0;
@@ -99,7 +156,6 @@ const posts = (await getCollection('blog')).sort(
 		text-align: center;
 	}
 	
-	/* PCサイズ以上でのレイアウト */
 	@media (min-width: 768px) {
 		.hero-container {
 			flex-direction: row;
@@ -124,6 +180,32 @@ const posts = (await getCollection('blog')).sort(
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 		font-size: 0.9rem;
+		display: block;
+		margin-bottom: 0.5rem;
+	}
+
+	/* ★タイピングアニメーションのスタイル */
+	.typewriter-container {
+		font-family: 'Courier New', Courier, monospace; /* 等幅フォント */
+		font-size: 1.2rem;
+		font-weight: bold;
+		color: #555;
+		margin-bottom: 0.5rem;
+		min-height: 1.5em; /* ガタつき防止 */
+	}
+	.typing-text {
+		color: #333;
+	}
+	.cursor {
+		display: inline-block;
+		width: 2px;
+		background-color: #333;
+		animation: blink 1s step-end infinite;
+		margin-left: 2px;
+	}
+	@keyframes blink {
+		from, to { opacity: 1; }
+		50% { opacity: 0; }
 	}
 
 	h1 {
@@ -148,16 +230,16 @@ const posts = (await getCollection('blog')).sort(
 	.links {
 		display: flex;
 		gap: 1rem;
-		justify-content: center; /* スマホは中央 */
+		justify-content: center;
 	}
 	@media (min-width: 768px) {
-		.links { justify-content: flex-start; } /* PCは左寄せ */
+		.links { justify-content: flex-start; }
 	}
 
 	.button {
 		padding: 0.8rem 1.5rem;
 		text-decoration: none;
-		border-radius: 50px; /* 丸みをつける */
+		border-radius: 50px;
 		font-weight: bold;
 		transition: all 0.2s ease;
 		font-size: 0.95rem;
@@ -182,22 +264,20 @@ const posts = (await getCollection('blog')).sort(
 		border-color: #bbb;
 	}
 
-	/* プレースホルダー画像（円形の装飾） */
-	.placeholder-shape {
-		width: 280px;
-		height: 280px;
-		background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-		border-radius: 50%; /* 丸にする */
+	/* ★画像のスタイル調整 */
+	.image-wrapper {
+		/* 必要に応じて背景装飾を追加可能 */
 		position: relative;
-		overflow: hidden;
 	}
-	/* ここに写真を入れる場合 */
+	
+	/* AstroのImageコンポーネントに適用されるクラス */
 	.profile-img {
 		width: 280px;
 		height: 280px;
 		object-fit: cover;
-		border-radius: 50%;
-		box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+		border-radius: 50%; /* 丸くする */
+		box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* 影をつける */
+		border: 4px solid #fff; /* 白い枠線 */
 	}
 
 	.divider {
@@ -228,7 +308,7 @@ const posts = (await getCollection('blog')).sort(
 	.card {
 		text-decoration: none;
 		color: inherit;
-		background: #fff; /* 背景色 */
+		background: #fff;
 		border-radius: 12px;
 		overflow: hidden;
 		transition: transform 0.2s, box-shadow 0.2s;
@@ -241,14 +321,14 @@ const posts = (await getCollection('blog')).sort(
 
 	.card-image {
 		width: 100%;
-		height: 160px; /* 画像の高さ固定 */
+		height: 160px;
 		background: #f9f9f9;
 		overflow: hidden;
 	}
 	.card-image img {
 		width: 100%;
 		height: 100%;
-		object-fit: cover; /* 枠いっぱいにトリミング */
+		object-fit: cover;
 	}
 	.no-image {
 		height: 100%;
