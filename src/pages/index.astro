@@ -30,8 +30,6 @@ const posts = (await getCollection('blog')).sort(
 						<span id="typewriter-text" class="typing-text"></span>
 						<span class="cursor">|</span>
 					</div>
-
-					<h1>Web Dev &<br/>Engineering</h1>
 					<p class="bio">
 						早稲田大学 基幹理工学部 情報通信学科 2年<br/>
 						<strong>97kuek_</strong>
@@ -42,8 +40,7 @@ const posts = (await getCollection('blog')).sort(
 					</p>
 					
 					<div class="links">
-						<a href="/about" class="button primary">経歴・スキルを見る</a>
-						<a href="/publications" class="button secondary">研究業績</a>
+						<a href="/about" class="button primary">About me</a>
 					</div>
 				</div>
 				
@@ -92,9 +89,9 @@ const posts = (await getCollection('blog')).sort(
 
 		<script>
 			const phrases = [
-				"Waseda University Student",
-				"full-stack engineer",
-				"MATLAB enthusiast"
+				"Waseda University.",
+				"full-stack engineer.",
+				"MATLAB enthusiast."
 			];
 			
 			const textElement = document.getElementById('typewriter-text');

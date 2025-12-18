@@ -22,6 +22,7 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 		<BaseHead title={title} description={description} />
 
 		<style>
+			/* --- レイアウト全体 --- */
 			main {
 				width: calc(100% - 2em);
 				max-width: 100%;
@@ -41,6 +42,7 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 				height: auto;
 			}
 
+			/* --- 本文エリア --- */
 			.prose {
 				width: 720px;
 				max-width: calc(100% - 2em);
@@ -51,20 +53,48 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 				line-height: 1.7;
 			}
 
-			.prose h1 {
-				font-size: 1.8em;
+			/* Markdown内の見出しサイズを調整 
+			   :global() を使うことで <slot /> 内の要素を確実に制御します 
+			*/
+			.prose :global(h1) {
+				font-size: 1.3em; /* Markdown内の # */
 				margin-top: 1.5em;
+				margin-bottom: 0.5em;
+				line-height: 1.3;
 			}
-			.prose h2 {
-				font-size: 1.5em;
-				margin-top: 2em;
-				margin-bottom: 0.8em;
+
+			.prose :global(h2) {
+				font-size: 1.15em; /* Markdown内の ## (ここを小さくしました) */
+				margin-top: 1.8em;
+				margin-bottom: 0.6em;
 				border-bottom: 1px solid rgba(var(--gray), 0.25);
 				padding-bottom: 0.3em;
+				line-height: 1.4;
 			}
-			/* ...中略（既存のスタイル）... */
 
-			/* --- 追加：ナビゲーションのスタイル --- */
+			.prose :global(h3) {
+				font-size: 1.05em; /* Markdown内の ### */
+				margin-top: 1.5em;
+				margin-bottom: 0.5em;
+			}
+
+			/* --- 記事冒頭のメインタイトル --- */
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1.2;
+			}
+			.title h1 {
+				font-size: 1.6rem; /* ページ最上部のタイトル */
+				margin: 0 0 0.5em 0;
+			}
+			.date {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+
+			/* --- 記事前後のナビゲーション --- */
 			.post-navigation {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
@@ -111,21 +141,6 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 					grid-template-columns: 1fr;
 				}
 			}
-
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				font-size: 2rem;
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
 		</style>
 	</head>
 
@@ -152,6 +167,7 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 						<hr />
 					</div>
 					
+					{/* Markdownの中身がここに展開されます */}
 					<slot />
 
 					<nav class="post-navigation">
