@@ -6,13 +6,18 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import 'katex/dist/katex.min.css';
+import Giscuss from '../components/Giscuss.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+// Propsの型を拡張して、前後の記事データを受け取れるようにします
+interface Props extends CollectionEntry<'blog'>['data'] {
+	prevPost?: CollectionEntry<'blog'>;
+	nextPost?: CollectionEntry<'blog'>;
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost } = Astro.props;
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} />
 
@@ -23,7 +28,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin: 0;
 			}
 
-			/* アイキャッチ画像の設定 */
 			.hero-image {
 				width: 720px;
 				max-width: 100%;
@@ -37,7 +41,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				height: auto;
 			}
 
-			/* --- 記事本文エリアの設定 --- */
 			.prose {
 				width: 720px;
 				max-width: calc(100% - 2em);
@@ -48,7 +51,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				line-height: 1.7;
 			}
 
-			/* 見出し設定 */
 			.prose h1 {
 				font-size: 1.8em;
 				margin-top: 1.5em;
@@ -57,46 +59,59 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				font-size: 1.5em;
 				margin-top: 2em;
 				margin-bottom: 0.8em;
-				/* ダークモードでも眩しくないように、不透明度を使った色に修正 */
 				border-bottom: 1px solid rgba(var(--gray), 0.25);
 				padding-bottom: 0.3em;
 			}
-			.prose h3 {
-				font-size: 1.25em;
-				margin-top: 1.5em;
-				margin-bottom: 0.5em;
+			/* ...中略（既存のスタイル）... */
+
+			/* --- 追加：ナビゲーションのスタイル --- */
+			.post-navigation {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+				margin: 4rem 0 2rem 0;
+				padding-top: 2rem;
+				border-top: 1px solid rgba(var(--gray), 0.2);
 			}
 
-			/* 引用（blockquote）のデザインを追加 */
-			.prose blockquote {
-				border-left: 4px solid rgb(var(--accent)); /* 左にアクセントカラーの線 */
-				padding-left: 1em;
-				color: rgb(var(--gray));
-				font-style: italic;
-				margin: 1.5em 0;
-				background: rgba(var(--gray), 0.05); /* うっすら背景色 */
-				padding: 0.5em 1em;
-				border-radius: 0 4px 4px 0;
-			}
-
-			/* 画像・動画 */
-			.prose img, .prose video {
-				max-width: 100%;
-				height: auto;
+			.nav-card {
+				display: flex;
+				flex-direction: column;
+				padding: 1rem;
+				text-decoration: none;
+				color: inherit;
+				border: 1px solid rgba(var(--gray), 0.2);
 				border-radius: 8px;
-				margin: 1.5em 0; /* 画像の上下に少し余白 */
+				transition: all 0.2s ease;
 			}
-            
-            /* リスト（箇条書き）が詰まって見えないように調整 */
-            .prose ul, .prose ol {
-                margin-bottom: 1.5em;
-                padding-left: 1.5em;
-            }
-            .prose li {
-                margin-bottom: 0.5em;
-            }
 
-			/* --- タイトルエリア --- */
+			.nav-card:hover {
+				border-color: rgb(var(--accent));
+				background-color: rgba(var(--accent), 0.05);
+			}
+
+			.nav-card .label {
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+				margin-bottom: 0.5rem;
+			}
+
+			.nav-card .nav-title {
+				font-weight: bold;
+				font-size: 0.95rem;
+				line-height: 1.4;
+			}
+
+			.next {
+				text-align: right;
+			}
+
+			@media (max-width: 600px) {
+				.post-navigation {
+					grid-template-columns: 1fr;
+				}
+			}
+
 			.title {
 				margin-bottom: 1em;
 				padding: 1em 0;
@@ -110,9 +125,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.date {
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
 			}
 		</style>
 	</head>
@@ -139,7 +151,26 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<h1>{title}</h1>
 						<hr />
 					</div>
+					
 					<slot />
+
+					<nav class="post-navigation">
+						{prevPost ? (
+							<a href={`/blog/${prevPost.id}/`} class="nav-card prev">
+								<span class="label">← 前の記事</span>
+								<span class="nav-title">{prevPost.data.title}</span>
+							</a>
+						) : <div />}
+
+						{nextPost ? (
+							<a href={`/blog/${nextPost.id}/`} class="nav-card next">
+								<span class="label">次の記事 →</span>
+								<span class="nav-title">{nextPost.data.title}</span>
+							</a>
+						) : <div />}
+					</nav>
+
+					<Giscuss />
 				</div>
 			</article>
 		</main>

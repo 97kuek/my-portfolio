@@ -3,18 +3,34 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
+	// 1. 全記事を取得し、日付順（新しい順）に並べ替える
+	const posts = (await getCollection('blog')).sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+	);
+
+	return posts.map((post, index) => ({
 		params: { slug: post.id },
-		props: post,
+		props: {
+			post,
+			// 2. インデックスを元に「一つ前（古い）」と「一つ後（新しい）」を特定
+			// 配列の並びが [最新, ..., 最古] なので、index+1が前の記事（古い）になります
+			prev: posts[index + 1], 
+			next: posts[index - 1],
+		},
 	}));
 }
-type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props;
+// Propsの型を修正（post, prev, next を含むオブジェクトになる）
+type Props = {
+	post: CollectionEntry<'blog'>;
+	prev?: CollectionEntry<'blog'>;
+	next?: CollectionEntry<'blog'>;
+};
+
+const { post, prev, next } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} prevPost={prev} nextPost={next}>
 	<Content />
 </BlogPost>
