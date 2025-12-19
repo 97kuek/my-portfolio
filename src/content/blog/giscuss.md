@@ -2,6 +2,7 @@
 title: Giscussで静的サイトにコメント機能をつける
 description: 'コメント機能の実装方法'
 pubDate: '2025-12-19'
+heroImage: '../../assets/giscuss.png'
 tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 ---
 
@@ -12,10 +13,15 @@ tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 この記事では，Astroで構築したブログにGiscussを組み込む全手順を解説します．
 
 ## 目次
+1. [GitHubリポジトリの設定](#1-githubリポジトリの設定)
+2. [Giscussの設定値を取得する](#2-giscussの設定値を取得する)
+3. [Astroコンポーネントの作成](#3-astroコンポーネントの作成)
+4. [レイアウトへの組み込み](#4-レイアウトへの組み込み)
+5. [まとめ](#5-まとめ)
 
 ## 1. GitHubリポジトリの設定
 
-Giscussを動かすには、ブログのリポジトリで以下の設定が必要です。
+Giscussを動かすには，ブログのリポジトリで以下の設定が必要です．
 
 1. **リポジトリをPublicにする**: プライベートリポジトリでは動作しません．
 2. **Discussionsを有効化する**: リポジトリの `Settings > General > Features` から「Discussions」にチェックを入れます．
@@ -24,40 +30,37 @@ Giscussを動かすには、ブログのリポジトリで以下の設定が必�
 
 ## 2. Giscussの設定値を取得する
 
-[giscuss](https://giscus.app/ja) にアクセスし、自分のリポジトリ情報を入力して専用の`<script>`タグを生成します。
+[giscuss](https://giscus.app/ja) にアクセスし，自分のリポジトリ情報を入力して専用の`<script>`タグを生成します．
 
 * **リポジトリ**: `ユーザー名/リポジトリ名`
-* **ページと議論の紐付け**: 「議論のタイトルがページの pathname を含む」がおすすめ。
-* **カテゴリー**: ブログ用途なら「Announcements」を選択します。
+* **ページとDiscussions連携設定**: Discussionのタイトルにページの pathnameを利用する設定がおすすめ．
+* **カテゴリー**: ブログ用途なら**Announcements**がおすすめです．
+* **機能**: **リアクション**を有効にしておくと，コメントの下に絵文字で簡単にリアクションができます．
+* **テーマ**: コメント欄のスタイルを変更できます．自分のブログにあったスタイルを見つけましょう．
 
-ここで発行される `data-repo-id` や `data-category-id` は、次のステップでコンポーネントを作る際に使用します。
+一通り設定が終わると，サイトの下部にコードが生成されます．その内容をコピーしましょう．
 
 ## 3. Astroコンポーネントの作成
 
-Astroで使い回せるように、`src/components/Giscuss.astro` を作成します。
+次にAstroで使い回せるように，`src/components/Giscuss.astro` を作成します．先ほどのコピーしたコードをそのまま貼り付けましょう．
 
 ```astro
----
-// src/components/Giscuss.astro
----
-
 <section class="giscuss-container">
-  <script is:inline
-    src="https://giscuss.app/client.js"
-    data-repo="[ユーザー名]/[リポジトリ名]"
-    data-repo-id="[あなたのリポジトリID]"
-    data-category="Announcements"
-    data-category-id="[あなたのカテゴリーID]"
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="bottom"
-    data-theme="preferred_color_scheme"
-    data-lang="ja"
-    crossorigin="anonymous"
-    async>
-  </script>
+    <script src="https://giscus.app/client.js"
+        data-repo="[リポジトリを記述]"
+        data-repo-id="[リポジトリIDを記述]"
+        data-category="[カテゴリ名を記述]"
+        data-category-id="[カテゴリIDを記述]"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="ja"
+        crossorigin="anonymous"
+        async>
+    </script>
 </section>
 
 <style>
@@ -70,11 +73,12 @@ Astroで使い回せるように、`src/components/Giscuss.astro` を作成し�
 
 ```
 
-> **Point**: Astroで外部スクリプトを動かすために、`<script>`タグには `is:inline` を付与するのがコツです。
+**Point**: Astroで外部スクリプトを動かすために、`<script>`タグには `is:inline` を付与するのがコツです。
 
 ## 4. レイアウトへの組み込み
 
-作成したコンポーネントを，ブログ記事用のレイアウト（例：`src/layouts/BlogPost.astro`）で読み込みます。．
+作成したコンポーネントを，ブログ記事用のレイアウト（例：`src/layouts/BlogPost.astro`）で読み込みます．
+
 ```astro
 ---
 import Giscuss from '../components/Giscuss.astro';
@@ -86,6 +90,7 @@ import Giscuss from '../components/Giscuss.astro';
 
   <Giscuss />
 </article>
+```
 
 ## 5. まとめ
 

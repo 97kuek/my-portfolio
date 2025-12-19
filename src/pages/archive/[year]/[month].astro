@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '/src/components/BaseHead.astro';
+import Header from '/src/components/Header.astro';
+import Footer from '/src/components/Footer.astro';
+import FormattedDate from '/src/components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '/src/consts';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  
+  // すべての記事から「年/月」の組み合わせを抽出
+  const archiveMap = allPosts.map(post => {
+    const d = post.data.pubDate;
+    return {
+      year: d.getFullYear().toString(),
+      month: (d.getMonth() + 1).toString().padStart(2, '0')
+    };
+  });
+
+  // 重複を削除
+  const uniqueMonths = Array.from(new Set(archiveMap.map(m => `${m.year}-${m.month}`)))
+    .map(s => {
+      const [year, month] = s.split('-');
+      return { year, month };
+    });
+
+  return uniqueMonths.map(({ year, month }) => {
+    const filteredPosts = allPosts.filter((post) => {
+      const d = post.data.pubDate;
+      return d.getFullYear().toString() === year && (d.getMonth() + 1).toString().padStart(2, '0') === month;
+    }).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+    return {
+      params: { year, month },
+      props: { posts: filteredPosts },
+    };
+  });
+}
+
+const { year, month } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`${year}年${month}月の記事一覧 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main { width: 720px; max-width: calc(100% - 2em); margin: auto; padding: 3em 1em; }
+			h2 { border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 2rem; }
+			ul { list-style: none; padding: 0; }
+			li { margin-bottom: 1.5rem; }
+			.date { font-size: 0.8rem; color: #888; }
+			a { text-decoration: none; color: inherit; }
+			a:hover { color: var(--accent); }
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h2>{year}年{month}月の記事一覧</h2>
+			<ul>
+				{posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`}>
+							<p class="date"><FormattedDate date={post.data.pubDate} /></p>
+							<h4>{post.data.title}</h4>
+						</a>
+					</li>
+				))}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
