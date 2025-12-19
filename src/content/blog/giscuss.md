@@ -42,9 +42,9 @@ Giscussを動かすには，ブログのリポジトリで以下の設定が必�
 
 ## 3. Astroコンポーネントの作成
 
-次にAstroで使い回せるように，`src/components/Giscuss.astro` を作成します．先ほどのコピーしたコードをそのまま貼り付けましょう．
+次にAstroで使い回せるように，`src/components/Giscus.astro` を作成します．先ほどのコピーしたコードをそのまま貼り付けましょう．
 
-```astro
+```astro Giscus.astro
 <section class="giscuss-container">
     <script src="https://giscus.app/client.js"
         data-repo="[リポジトリを記述]"

@@ -6,14 +6,18 @@ import { defineConfig } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+import expressiveCode from 'astro-expressive-code';
+
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
-	integrations: [mdx(), sitemap()],
+    site: 'https://example.com',
 
-	// 2. 追加: ここで数式プラグインを有効化します
-	markdown: {
-		remarkPlugins: [remarkMath],
-		rehypePlugins: [rehypeKatex],
-	},
+    // ▼▼▼ ここを修正しました（expressiveCodeを先頭に移動） ▼▼▼
+    integrations: [expressiveCode(), mdx(), sitemap()],
+
+    // 2. 追加: ここで数式プラグインを有効化します
+    markdown: {
+        remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex],
+    },
 });
