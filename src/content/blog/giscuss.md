@@ -1,7 +1,7 @@
 ---
 title: Giscussで静的サイトにコメント機能をつける
 description: 'コメント機能の実装方法'
-pubDate: '2025-12-19'
+pubDate: '2025-08-11'
 heroImage: '../../assets/giscuss.png'
 tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 ---
@@ -44,7 +44,7 @@ Giscussを動かすには，ブログのリポジトリで以下の設定が必�
 
 次にAstroで使い回せるように，`src/components/Giscus.astro` を作成します．先ほどのコピーしたコードをそのまま貼り付けましょう．
 
-```astro Giscus.astro
+```astro title="src/components/Giscus.astro"
 <section class="giscuss-container">
     <script src="https://giscus.app/client.js"
         data-repo="[リポジトリを記述]"
@@ -73,13 +73,11 @@ Giscussを動かすには，ブログのリポジトリで以下の設定が必�
 
 ```
 
-**Point**: Astroで外部スクリプトを動かすために、`<script>`タグには `is:inline` を付与するのがコツです。
-
 ## 4. レイアウトへの組み込み
 
 作成したコンポーネントを，ブログ記事用のレイアウト（例：`src/layouts/BlogPost.astro`）で読み込みます．
 
-```astro
+```astro title="src/layouts/BlogPost.astro"
 ---
 import Giscuss from '../components/Giscuss.astro';
 // ...他のインポート

@@ -1,7 +1,7 @@
 ---
 title: XFLR5の解析結果からXROTORのパラメータを自動算出するツールを作った話
 description: 'AEROSECTIONのパラメータ設定方法'
-pubDate: '2025-12-18'
+pubDate: '2025-09-28'
 heroImage: '../../assets/xrotor.jpg'
 tags: ['設計', '人力飛行機', '技術解説', 'XROTOR', 'XFLR5']
 ---

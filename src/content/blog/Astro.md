@@ -1,7 +1,7 @@
 ---
 title: '僕がポートフォリオサイトにAstroを選んだ理由'
 description: '新世代の静的サイトジェネレーター「Astro」の特徴とセットアップ方法を解説します！'
-pubDate: '2025-12-17'
+pubDate: '2025-08-02'
 heroImage: '../../assets/astro.png'
 tags: ['Astro', 'Web開発', '技術解説']
 ---
