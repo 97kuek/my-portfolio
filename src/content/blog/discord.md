@@ -38,7 +38,7 @@ npm install discord.js
 
 コマンドを打ち終えたら，フォルダ内に `index.js` というファイルを作成し，以下のコードを記述します．
 
-```javascript index.js
+```javascript title="index.js"
 const { Client, GatewayIntentBits } = require('discord.js');
 
 // ボットが受け取る情報の種類を設定
@@ -87,13 +87,13 @@ npm install dotenv
 
 実行し終えたら，`package.json`と同じ階層に`.env`ファイルを作成し，以下のように記述してください
 
-``` .env
+``` .env title=".env"
 DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
 ```
 
 次に，index.jsを以下のように修正してください
 
-```javascript index.js
+```javascript title="index.js"
 const { Client, GatewayIntentBits } = require('discord.js');
 const dotenv = require('dotenv');
 dotenv.config();
