@@ -67,7 +67,7 @@ const posts = (await getCollection('blog')).sort(
 				
 				<div class="card-grid">
 					{posts.map((post) => (
-						<a href={`/blog/${post.slug}/`} class="card">
+						<a href={`/blog/${post.id}/`} class="card">
 							<div class="card-image">
 								{post.data.heroImage ? (
 									<Image src={post.data.heroImage} width={400} height={200} alt="" />

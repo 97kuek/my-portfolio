@@ -5,16 +5,20 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ShareButtons from '../components/ShareButtons.astro';
 import 'katex/dist/katex.min.css';
 import Giscuss from '../components/Giscuss.astro';
 
-// Propsの型を拡張して、前後の記事データを受け取れるようにします
+// Propsの型を拡張
 interface Props extends CollectionEntry<'blog'>['data'] {
 	prevPost?: CollectionEntry<'blog'>;
 	nextPost?: CollectionEntry<'blog'>;
+    relatedPosts?: CollectionEntry<'blog'>[];
+    headings?: { depth: number; slug: string; text: string }[];
 }
 
-const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost, relatedPosts, headings } = Astro.props;
 ---
 
 <html lang="ja">
@@ -94,12 +98,93 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 				color: rgb(var(--gray));
 			}
 
+            /* --- 目次 --- */
+            .toc {
+                background: #f9f9f9;
+                border: 1px solid #eee;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin-bottom: 3rem;
+            }
+            .toc-title {
+                font-weight: bold;
+                margin: 0 0 0.5rem 0;
+                font-size: 1.1rem;
+            }
+            .toc ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+            .toc li {
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+            }
+            .toc li.depth-3 {
+                padding-left: 1.5rem;
+                font-size: 0.95em;
+            }
+            .toc a {
+                color: #555;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .toc a:hover {
+                color: var(--accent);
+                text-decoration: underline;
+            }
+
+            /* --- 関連記事 --- */
+            .related-posts {
+                margin: 4rem 0 2rem;
+                padding-top: 2rem;
+                border-top: 1px solid #eee;
+            }
+            .related-posts h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+            .related-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+            .related-card {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                transition: transform 0.2s;
+            }
+            .related-card:hover {
+                transform: translateY(-2px);
+                color: var(--accent);
+            }
+            .related-image {
+                width: 100%;
+                aspect-ratio: 16/9;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+                background: #f0f0f0;
+            }
+            .related-title {
+                font-size: 0.95rem;
+                font-weight: bold;
+                line-height: 1.4;
+            }
+            .related-date {
+                font-size: 0.8rem;
+                color: #888;
+                margin-top: 0.25rem;
+            }
+
+
 			/* --- 記事前後のナビゲーション --- */
 			.post-navigation {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
 				gap: 1rem;
-				margin: 4rem 0 2rem 0;
+				margin: 2rem 0;
 				padding-top: 2rem;
 				border-top: 1px solid rgba(var(--gray), 0.2);
 			}
@@ -147,6 +232,7 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 	<body>
 		<Header />
 		<main>
+            <Breadcrumbs />
 			<article>
 				<div class="hero-image">
 					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" loading="eager" />}
@@ -162,13 +248,50 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 									</div>
 								)
 							}
+                            <span class="reading-time-container">
+                                • <span id="reading-time">計算中...</span>
+                            </span>
 						</div>
 						<h1>{title}</h1>
 						<hr />
 					</div>
 					
+                    {headings && headings.length > 0 && (
+                        <div class="toc">
+                            <p class="toc-title">目次</p>
+                            <ul>
+                                {headings.filter(h => h.depth <= 3).map(h => (
+                                    <li class={`depth-${h.depth}`}>
+                                        <a href={`#${h.slug}`}>{h.text}</a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
 					{/* Markdownの中身がここに展開されます */}
 					<slot />
+
+                    <ShareButtons title={title} url={Astro.url} />
+
+                    {relatedPosts && relatedPosts.length > 0 && (
+                        <div class="related-posts">
+                            <h3>関連記事</h3>
+                            <div class="related-grid">
+                                {relatedPosts.map(post => (
+                                    <a href={`/blog/${post.id}/`} class="related-card">
+                                        {post.data.heroImage ? (
+                                            <Image width={300} height={170} src={post.data.heroImage} alt="" class="related-image" />
+                                        ) : (
+                                            <div class="related-image"></div>
+                                        )}
+                                        <div class="related-title">{post.data.title}</div>
+                                        <div class="related-date"><FormattedDate date={post.data.pubDate} /></div>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
 					<nav class="post-navigation">
 						{prevPost ? (
@@ -191,5 +314,26 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost 
 			</article>
 		</main>
 		<Footer />
+        <script>
+            // 推定読了時間の計算
+            function calculateReadingTime() {
+                const articleBody = document.querySelector('.prose');
+                if (!articleBody) return;
+
+                const text = articleBody.textContent || '';
+                const wordCount = text.length;
+                const readingTime = Math.ceil(wordCount / 500); // 1分あたり500文字と仮定
+                
+                const readingTimeElement = document.getElementById('reading-time');
+                if (readingTimeElement) {
+                    readingTimeElement.textContent = `約 ${readingTime} 分で読めます`;
+                }
+            }
+
+            // ページロード時とView Transition時に実行
+            document.addEventListener('astro:page-load', calculateReadingTime);
+            // 通常のロード用
+            document.addEventListener('DOMContentLoaded', calculateReadingTime);
+        </script>
 	</body>
 </html>

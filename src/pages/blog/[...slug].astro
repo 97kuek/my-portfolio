@@ -8,29 +8,51 @@ export async function getStaticPaths() {
 		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 	);
 
-	return posts.map((post, index) => ({
-		params: { slug: post.id },
-		props: {
-			post,
-			// 2. インデックスを元に「一つ前（古い）」と「一つ後（新しい）」を特定
-			// 配列の並びが [最新, ..., 最古] なので、index+1が前の記事（古い）になります
-			prev: posts[index + 1], 
-			next: posts[index - 1],
-		},
-	}));
+	return posts.map((post, index) => {
+        // 関連記事の算出: 同じタグを持つ記事を探す
+        const currentTags = new Set(post.data.tags || []);
+        const related = posts
+            .filter(p => p.id !== post.id) // 自分自身を除外
+            .map(p => {
+                const pTags = p.data.tags || [];
+                const commonTags = pTags.filter(t => currentTags.has(t)).length;
+                return { post: p, commonTags };
+            })
+            .filter(item => item.commonTags > 0) // 共通タグが1つ以上あるもの
+            .sort((a, b) => {
+                // 1. 共通タグ数が多い順
+                if (b.commonTags !== a.commonTags) return b.commonTags - a.commonTags;
+                // 2. 日付が新しい順
+                return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
+            })
+            .slice(0, 3) // 上位3件
+            .map(item => item.post);
+
+        return {
+            params: { slug: post.id },
+            props: {
+                post,
+                // 2. インデックスを元に「一つ前（古い）」と「一つ後（新しい）」を特定
+                prev: posts[index + 1], 
+                next: posts[index - 1],
+                relatedPosts: related,
+            },
+        };
+    });
 }
 
-// Propsの型を修正（post, prev, next を含むオブジェクトになる）
+// Propsの型を修正
 type Props = {
 	post: CollectionEntry<'blog'>;
 	prev?: CollectionEntry<'blog'>;
 	next?: CollectionEntry<'blog'>;
+    relatedPosts?: CollectionEntry<'blog'>[];
 };
 
-const { post, prev, next } = Astro.props;
-const { Content } = await render(post);
+const { post, prev, next, relatedPosts } = Astro.props;
+const { Content, headings } = await render(post);
 ---
 
-<BlogPost {...post.data} prevPost={prev} nextPost={next}>
+<BlogPost {...post.data} prevPost={prev} nextPost={next} relatedPosts={relatedPosts} headings={headings}>
 	<Content />
 </BlogPost>

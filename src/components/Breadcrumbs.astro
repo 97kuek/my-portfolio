@@ -1,0 +1,98 @@
+---
+const { className } = Astro.props;
+
+const paths = Astro.url.pathname.split('/').filter(Boolean);
+let breadcrumbs = [];
+
+// Homeは常に先頭
+breadcrumbs.push({
+  text: 'Home',
+  href: '/',
+  active: paths.length === 0
+});
+
+// パスに基づいてパンくずを生成
+let currentPath = '';
+paths.forEach((path, index) => {
+  currentPath += `/${path}`;
+  const isLast = index === paths.length - 1;
+  
+  // URLデコードして表示名を綺麗にする（日本語対応）
+  let text = decodeURIComponent(path);
+  
+  // 特定のパス名を置換
+  if (path === 'blog') text = 'Blog';
+  if (path === 'archive') text = 'Archive';
+  
+  // IDの場合は「Article」などに置き換えるか、そのまま表示
+  // ※本来は記事タイトルを取得したいが、ここでは簡易的にIDを表示
+  
+  breadcrumbs.push({
+    text: text,
+    href: currentPath + (isLast ? '/' : ''), // トレイリングスラッシュ対応
+    active: isLast
+  });
+});
+
+// JSON-LDスキーマ
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbs.map((crumb, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": crumb.text,
+    "item": new URL(crumb.href, Astro.site || Astro.url.origin).toString()
+  }))
+};
+---
+
+<nav aria-label="Breadcrumb" class:list={['breadcrumbs', className]}>
+  <ol>
+    {breadcrumbs.map((crumb, index) => (
+      <li class:list={['breadcrumb-item', { active: crumb.active }]}>
+        {crumb.active ? (
+          <span aria-current="page">{crumb.text}</span>
+        ) : (
+          <a href={crumb.href}>{crumb.text}</a>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<style>
+  .breadcrumbs {
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .breadcrumb-item:not(:last-child)::after {
+    content: "/";
+    margin: 0 0.5rem;
+    color: #ccc;
+  }
+  .breadcrumb-item a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s;
+  }
+  .breadcrumb-item a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .breadcrumb-item.active {
+    color: #333;
+    font-weight: 500;
+  }
+</style>

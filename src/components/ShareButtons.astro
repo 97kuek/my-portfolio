@@ -1,0 +1,94 @@
+---
+import { Icon } from 'astro-icon/components'; // アイコンを使いたい場合（今回はSVG直接埋め込みで対応）
+
+interface Props {
+	title: string;
+	url: string | URL;
+}
+
+const { title, url } = Astro.props;
+
+const urlStr = typeof url === 'string' ? url : url.toString();
+const encodedUrl = encodeURIComponent(urlStr);
+const encodedTitle = encodeURIComponent(title);
+
+// シェア用URL
+const xUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
+const hatenaUrl = `https://b.hatena.ne.jp/entry/${urlStr.replace(/^https?:\/\//, '')}`;
+const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
+
+// アイコンSVG (簡易版)
+const xIcon = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>`;
+// Hatenaは文字Bで代用、LINEは文字Lで代用するなど、アイコンライブラリがない場合はSVGパスで描画するか文字で代用
+---
+
+<div class="share-buttons">
+    <p class="share-label">この記事をシェアする</p>
+    <div class="buttons">
+        <a href={xUrl} target="_blank" rel="noopener noreferrer" class="btn x-twitter" aria-label="Xでシェア">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+            <span>Post</span>
+        </a>
+        <a href={hatenaUrl} target="_blank" rel="noopener noreferrer" class="btn hatena" aria-label="はてなブックマークに追加">
+            <span class="hatena-icon">B!</span>
+            <span>Hatena</span>
+        </a>
+        <a href={lineUrl} target="_blank" rel="noopener noreferrer" class="btn line" aria-label="LINEで送る">
+             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"></path><path d="M12 6C10.6 6 9.35 6.4 8.25 7.1C7.15 7.8 6.4 8.75 6 9.85L7.85 10.6C8.1 9.95 8.5 9.4 9.05 9.05C9.6 8.7 10.25 8.5 11 8.5C12.65 8.5 13.5 9.35 13.5 11V11.15C13.2 11.05 12.85 11 12.5 11C10.3 11 8.5 12.1 8.5 13.75C8.5 14.85 9.15 15.65 10.25 15.65C11.15 15.65 11.95 15.2 12.45 14.5V15.5H14.5V11C14.5 9.65 14 8.6 13.05 7.85C12.1 7.1 10.85 6.7 9.35 6.7C7.6 6.7 6.2 7.3 5.2 8.5L6.65 9.95C7.3 9.3 8.25 9 9.35 9C10.2 9 10.9 9.2 11.4 9.6C11.9 10 12.15 10.55 12.15 11.25V11.25H12.5V11.25C12.5 11.25 12.5 11.25 12.5 11.25ZM12.5 13.35C12.5 13.9 12.05 14.25 11.5 14.25C11.15 14.25 10.85 14.1 10.65 13.8C10.45 13.5 10.35 13.2 10.35 12.85C10.35 12.3 10.55 11.9 10.95 11.65C11.35 11.4 11.85 11.25 12.5 11.25V13.35Z"></path></svg>
+             <span>LINE</span>
+        </a>
+    </div>
+</div>
+
+<style>
+    .share-buttons {
+        margin: 3rem 0;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .share-label {
+        margin: 0 0 1rem 0;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: transform 0.2s, opacity 0.2s;
+        color: white;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+        text-decoration: none;
+        color: white;
+    }
+    .x-twitter {
+        background-color: #000;
+    }
+    .hatena {
+        background-color: #00A4DE;
+    }
+    .hatena-icon {
+        font-family: serif;
+        font-weight: 900;
+    }
+    .line {
+        background-color: #06C755;
+    }
+</style>

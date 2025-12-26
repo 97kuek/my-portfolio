@@ -1,6 +1,6 @@
 ---
 title: Giscussで静的サイトにコメント機能をつける
-description: 'コメント機能の実装方法'
+description: 'Giscussを使って、データベース不要で静的サイトにコメント機能を実装する方法を解説します。'
 pubDate: '2025-08-11'
 heroImage: '../../assets/giscuss.png'
 tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
@@ -8,9 +8,9 @@ tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 
 ## はじめに
 
-個人開発のブログにコメント機能を載せたいけれど，データベースを管理するのは面倒……。そんな時に最適なのが、GitHub Discussionsをバックエンドとして利用する**Giscuss**です．
+個人開発のブログにコメント機能を載せたいけれど、データベースを管理するのは面倒……。そんな時に最適なのが、GitHub Discussionsをバックエンドとして利用する**Giscuss**です。
 
-この記事では，Astroで構築したブログにGiscussを組み込む全手順を解説します．
+この記事では、Astroで構築したブログにGiscussを組み込む全手順を解説します。
 
 ## 目次
 1. [GitHubリポジトリの設定](#1-githubリポジトリの設定)
@@ -21,30 +21,30 @@ tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 
 ## 1. GitHubリポジトリの設定
 
-Giscussを動かすには，ブログのリポジトリで以下の設定が必要です．
+Giscussを動かすには、ブログのリポジトリで以下の設定が必要です。
 
-1. **リポジトリをPublicにする**: プライベートリポジトリでは動作しません．
-2. **Discussionsを有効化する**: リポジトリの `Settings > General > Features` から「Discussions」にチェックを入れます．
-3. **giscuss-appをインストール**: [giscussダウンロードサイト](https://github.com/apps/giscus) にアクセスし，対象のリポジトリに対してアクセス権限を許可します．
+1. **リポジトリをPublicにする**: プライベートリポジトリでは動作しません。
+2. **Discussionsを有効化する**: リポジトリの `Settings > General > Features` から「Discussions」にチェックを入れます。
+3. **giscuss-appをインストール**: [giscussダウンロードサイト](https://github.com/apps/giscus) にアクセスし、対象のリポジトリに対してアクセス権限を許可します。
 
 
 ## 2. Giscussの設定値を取得する
 
-[giscuss](https://giscus.app/ja) にアクセスし，自分のリポジトリ情報を入力して専用の`<script>`タグを生成します．
+[giscuss](https://giscus.app/ja) にアクセスし、自分のリポジトリ情報を入力して専用の`<script>`タグを生成します。
 
 * **リポジトリ**: `ユーザー名/リポジトリ名`
-* **ページとDiscussions連携設定**: Discussionのタイトルにページの pathnameを利用する設定がおすすめ．
-* **カテゴリー**: ブログ用途なら**Announcements**がおすすめです．
-* **機能**: **リアクション**を有効にしておくと，コメントの下に絵文字で簡単にリアクションができます．
-* **テーマ**: コメント欄のスタイルを変更できます．自分のブログにあったスタイルを見つけましょう．
+* **ページとDiscussions連携設定**: Discussionのタイトルにページの pathnameを利用する設定がおすすめ。
+* **カテゴリー**: ブログ用途なら**Announcements**がおすすめです。
+* **機能**: **リアクション**を有効にしておくと、コメントの下に絵文字で簡単にリアクションができます。
+* **テーマ**: コメント欄のスタイルを変更できます。自分のブログにあったスタイルを見つけましょう。
 
-一通り設定が終わると，サイトの下部にコードが生成されます．その内容をコピーしましょう．
+一通り設定が終わると、サイトの下部にコードが生成されます。その内容をコピーしましょう。
 
 ## 3. Astroコンポーネントの作成
 
-次にAstroで使い回せるように，`src/components/Giscus.astro` を作成します．先ほどのコピーしたコードをそのまま貼り付けましょう．
+次にAstroで使い回せるように、`src/components/Giscuss.astro` を作成します。先ほどのコピーしたコードをそのまま貼り付けましょう。
 
-```astro title="src/components/Giscus.astro"
+```astro title="src/components/Giscuss.astro"
 <section class="giscuss-container">
     <script src="https://giscus.app/client.js"
         data-repo="[リポジトリを記述]"
@@ -75,7 +75,7 @@ Giscussを動かすには，ブログのリポジトリで以下の設定が必�
 
 ## 4. レイアウトへの組み込み
 
-作成したコンポーネントを，ブログ記事用のレイアウト（例：`src/layouts/BlogPost.astro`）で読み込みます．
+作成したコンポーネントを、ブログ記事用のレイアウト（例：`src/layouts/BlogPost.astro`）で読み込みます。
 
 ```astro title="src/layouts/BlogPost.astro"
 ---
@@ -92,10 +92,10 @@ import Giscuss from '../components/Giscuss.astro';
 
 ## 5. まとめ
 
-Giscussを導入することで，以下のようなメリットがあります．
+Giscussを導入することで、以下のようなメリットがあります。
 
-* **ログイン不要**: GitHubアカウントを持っていればすぐにコメントできる．
-* **リアクション機能**: 絵文字で気軽に反応がもらえる．
-* **完全無料**: サーバー維持費やDB管理のコストがゼロ．
+* **ログイン不要**: GitHubアカウントを持っていればすぐにコメントできる。
+* **リアクション機能**: 絵文字で気軽に反応がもらえる。
+* **完全無料**: サーバー維持費やDB管理のコストがゼロ。
 
 開発者ブログとの相性は抜群なので、ぜひ試してみてください！
