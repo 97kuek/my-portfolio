@@ -10,7 +10,7 @@ import expressiveCode from 'astro-expressive-code';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://example.com',
+    site: 'https://97kuek.vercel.app',
 
     // ▼▼▼ ここを修正しました（expressiveCodeを先頭に移動） ▼▼▼
     integrations: [expressiveCode(), mdx(), sitemap()],

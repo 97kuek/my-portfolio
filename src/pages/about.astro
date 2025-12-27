@@ -9,7 +9,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	pubDate={new Date('2025-12-16')}
 	heroImage={aboutImg}
 >
-	<div class="intro-section">
+	<div class="intro-section fade-in-up">
 		<p class="lead">
 			早稲田大学 基幹理工学部 情報通信学科<br>
 			<strong>「エンジニアリング」と「ものづくり」</strong>が好きです．<br>
@@ -19,7 +19,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 
 	<hr class="divider" />
 
-	<div class="content-block">
+	<div class="content-block glass-panel fade-in-up" style="animation-delay: 0.1s; padding: 2rem; border-radius: 12px;">
 		<h2>Activities</h2>
 		<p>
 			<strong>早稲田大学宇宙航空研究会 (WASA) 鳥人間プロジェクト</strong><br>
@@ -28,12 +28,12 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		</p>
 	</div>
 
-	<div class="content-block">
+	<div class="content-block fade-in-up" style="animation-delay: 0.2s;">
 		<h2>Skills & Interests</h2>
-		<p>数値解析，画像処理，3Dモデリングの自動化などを中心に扱っています．</p>
+		<p style="margin-bottom: 2rem;">数値解析，画像処理，3Dモデリングの自動化などを中心に扱っています．</p>
 		
 		<div class="skill-grid">
-			<div class="skill-category">
+			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
 				<h3>Languages</h3>
 				<div class="tags">
 					<span class="tag">Python</span>
@@ -43,7 +43,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				</div>
 			</div>
 
-			<div class="skill-category">
+			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
 				<h3>Engineering & Design</h3>
 				<div class="tags">
 					<span class="tag">Blender API</span>
@@ -53,7 +53,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				</div>
 			</div>
 
-			<div class="skill-category">
+			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
 				<h3>Web Development</h3>
 				<div class="tags">
 					<span class="tag">Astro</span>
@@ -65,11 +65,11 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		</div>
 	</div>
 
-	<div class="content-block">
+	<div class="content-block fade-in-up" style="animation-delay: 0.3s;">
 		<h2>Education</h2>
 		<ul class="timeline">
 			<li class="timeline-item current">
-				<div class="timeline-marker"></div>
+				<div class="timeline-marker pulse-marker"></div>
 				<div class="timeline-content">
 					<span class="date">2025.04 - Current</span>
 					<h3>早稲田大学 基幹理工学部 情報通信学科</h3>
@@ -118,11 +118,13 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	}
 	h2 {
 		/* 見出しのデザイン強化 */
-		font-size: 1.6em;
-		border-bottom: 2px solid var(--accent); /* 下線をアクセントカラーに */
-		padding-bottom: 0.3rem;
+		font-family: var(--font-heading);
+		font-size: 1.8em;
+		background: linear-gradient(120deg, transparent 60%, rgba(35, 55, 255, 0.1) 60%);
+		padding: 0 0.5rem 0.2rem;
 		margin-bottom: 1.5rem;
 		display: inline-block;
+		border-bottom: none; /* 下線を背景グラデーションに変更 */
 	}
 
 	/* --- スキルタグのデザイン --- */
@@ -143,20 +145,22 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		gap: 0.6rem;
 	}
 	.tag {
-		background: #f4f4f5;
+		background: rgba(255,255,255,0.8);
 		color: #333;
-		padding: 0.3rem 0.8rem;
-		border-radius: 6px;
+		padding: 0.4rem 1rem;
+		border-radius: 50px;
 		font-size: 0.9rem;
 		font-weight: 500;
-		border: 1px solid #e0e0e0;
-		transition: all 0.2s;
+		border: 1px solid rgba(255,255,255,0.5);
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 	}
 	.tag:hover {
 		background: var(--accent);
 		color: #fff;
 		border-color: var(--accent);
-		transform: translateY(-2px);
+		transform: translateY(-3px);
+		box-shadow: 0 5px 15px rgba(35, 55, 255, 0.3); /* Glow effect */
 	}
 
 	/* --- タイムラインのデザイン --- */
@@ -199,11 +203,22 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	/* 現在（最新）のステータスだけ色を変える */
 	.timeline-item.current .timeline-marker {
 		border-color: var(--accent);
-		background: var(--accent-light);
+		background: var(--accent);
+		box-shadow: 0 0 0 4px rgba(35, 55, 255, 0.2);
 	}
 	/* ホバー時に丸の色を変える */
 	.timeline-item:hover .timeline-marker {
 		border-color: var(--accent);
+		background: #fff;
+	}
+	
+	@keyframes pulse {
+		0% { box-shadow: 0 0 0 0 rgba(35, 55, 255, 0.4); }
+		70% { box-shadow: 0 0 0 10px rgba(35, 55, 255, 0); }
+		100% { box-shadow: 0 0 0 0 rgba(35, 55, 255, 0); }
+	}
+	.pulse-marker {
+		animation: pulse 2s infinite;
 	}
 
 	.timeline-content h3 {

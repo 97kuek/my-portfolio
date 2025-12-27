@@ -8,7 +8,7 @@ tags: ['Astro', 'Web開発', '技術解説', 'Giscuss']
 
 ## はじめに
 
-個人開発のブログにコメント機能を載せたいけれど、データベースを管理するのは面倒……。そんな時に最適なのが、GitHub Discussionsをバックエンドとして利用する**Giscuss**です。
+個人開発のブログにコメント機能を載せたいけれど、管理するのは面倒です。そんな時に最適なのが、GitHub Discussions をバックエンドとして利用する**Giscuss**です。
 
 この記事では、Astroで構築したブログにGiscussを組み込む全手順を解説します。
 
@@ -42,7 +42,7 @@ Giscussを動かすには、ブログのリポジトリで以下の設定が必�
 
 ## 3. Astroコンポーネントの作成
 
-次にAstroで使い回せるように、`src/components/Giscuss.astro` を作成します。先ほどのコピーしたコードをそのまま貼り付けましょう。
+次にAstroで使い回せるように、`src/components/Giscuss.astro` を作成します。先ほどコピーしたコードをそのまま貼り付けましょう。
 
 ```astro title="src/components/Giscuss.astro"
 <section class="giscuss-container">
