@@ -6,7 +6,9 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 export async function getStaticPaths() {
-    const posts = await getCollection('blog');
+    const posts = await getCollection('blog', ({ data }) => {
+        return import.meta.env.PROD ? data.draft !== true : true;
+    });
     return posts.map((post) => ({
         params: { slug: post.id },
         props: post,
