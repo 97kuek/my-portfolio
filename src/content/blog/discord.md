@@ -1,5 +1,5 @@
 ---
-title: '【Node.js】自分専用のDiscordボットを作る（セキュリティ配慮版）'
+title: 'Node.jsで自分専用のDiscordボットを作る'
 description: 'Node.jsとdiscord.jsを使ってボットを作成します。トークン管理など、セキュリティの基本を最初からしっかり押さえた手順解説です。'
 pubDate: '2025-12-20'
 tags: ['Discord', 'Node.js', 'Bot', '環境構築']
@@ -10,7 +10,7 @@ tags: ['Discord', 'Node.js', 'Bot', '環境構築']
 Discordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作って自動化できることです。
 特定の言葉に反応させたり、決まった時間に通知を送ったり、アイデア次第で何でもできます。
 
-今回は、「こんにちは」と話しかけると返事をしてくれるシンプルなボットを作りながら、**Node.jsでのボット開発の基礎** と **安全なトークン管理** の方法を解説します。
+今回は、「こんにちは」と話しかけると返事をしてくれるシンプルなボットを作りながら、**Node.jsでのボット開発の基礎**を解説します。
 
 ---
 
@@ -21,16 +21,10 @@ Discordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作�
 1.  [Discord Developer Portal](https://discord.com/developers/applications) にアクセスし、ログインします。
 2.  右上の **New Application** をクリックし、名前（例: MyFirstBot）を入力して作成します。
 3.  左メニューの **Bot** を選び、**Reset Token** をクリックしてトークンを表示・コピーします。
-    > [!CAUTION]
-    > **この「トークン」はボットのパスワードです。**
-    > **絶対に他人に教えたり、X(Twitter)やGitHubにそのまま貼り付けたりしないでください。**
-    > 万が一漏れた場合は、すぐに Reset Token してください。
-
-4.  **【超重要】Intents（権限）の設定**
+4.  **Intents（権限）の設定**
     同じBot設定ページの少し下に **Privileged Gateway Intents** という項目があります。
     ここで **Message Content Intent** を **ON** にして、下の「Save Changes」を押してください。
     *   これを忘れると、ボットがユーザーのメッセージの中身（「こんにちは」など）を読めず、反応できません。
-
 5.  **サーバーへの招待**
     左メニュー **OAuth2** > **URL Generator** を選びます。
     *   **SCOPES**: `bot` にチェック
