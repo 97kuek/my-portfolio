@@ -16,6 +16,7 @@ export default defineConfig({
 
     // ▼▼▼ ここを修正しました（expressiveCodeを先頭に移動） ▼▼▼
     integrations: [expressiveCode({
+        themes: ['github-dark'],
         frames: {
             showCopyToClipboardButton: true,
         },

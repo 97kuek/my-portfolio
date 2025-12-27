@@ -220,6 +220,15 @@ const posts = (await getCollection('blog')).sort(
         background-clip: text;
 	}
 
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+        .hero-container {
+            padding: 3rem 1.5rem;
+        }
+    }
+
 	.bio {
 		font-size: 1.2rem;
 		font-weight: bold;
@@ -275,6 +284,8 @@ const posts = (await getCollection('blog')).sort(
 	.profile-img {
 		width: 300px;
 		height: 300px;
+        max-width: 80vw;
+        max-height: 80vw;
 		object-fit: cover;
 		border-radius: 50%; /* 丸くする */
 		box-shadow: 0 20px 40px rgba(0,0,0,0.1); /* 影をつける */
@@ -296,6 +307,8 @@ const posts = (await getCollection('blog')).sort(
 		transform: translate(-50%, -50%);
 		width: 340px;
 		height: 340px;
+        max-width: 90vw;
+        max-height: 90vw;
 		background: radial-gradient(circle, rgba(35, 55, 255, 0.1) 0%, transparent 70%);
 		border-radius: 50%;
 		z-index: 1;

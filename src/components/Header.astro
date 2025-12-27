@@ -118,6 +118,27 @@ import Search from './Search.astro';
 		.social-links {
 			display: none;
 		}
+        nav {
+            justify-content: space-between;
+            height: auto;
+            padding: 1rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .internal-links {
+             display: flex;
+             gap: 0.5rem;
+        }
+
+        nav a {
+            padding: 0.5em 0.8em;
+            font-size: 0.95rem;
+        }
+        
+        .search-wrapper {
+            display: none; /* Hide search on mobile to save space */
+        }
 	}
     
     .search-wrapper {
