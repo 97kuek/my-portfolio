@@ -3,38 +3,39 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-	// 1. 全記事を取得し、日付順（新しい順）に並べ替える
-	const posts = (await getCollection('blog')).sort(
-		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-	);
+// 1. 全記事を取得し、日付順（新しい順）に並べ替える
+    const posts = await getCollection('blog');
+    const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-	return posts.map((post, index) => {
+	return sortedPosts.map((post, index) => {
         // 関連記事の算出: 同じタグを持つ記事を探す
         const currentTags = new Set(post.data.tags || []);
-        const related = posts
+        
+        // 関連度スコアを計算
+        const relatedCandidates = sortedPosts
             .filter(p => p.id !== post.id) // 自分自身を除外
             .map(p => {
                 const pTags = p.data.tags || [];
                 const commonTags = pTags.filter(t => currentTags.has(t)).length;
-                return { post: p, commonTags };
+                return { post: p, score: commonTags };
             })
-            .filter(item => item.commonTags > 0) // 共通タグが1つ以上あるもの
+            .filter(item => item.score > 0) // 共通タグが1つ以上あるもの
             .sort((a, b) => {
-                // 1. 共通タグ数が多い順
-                if (b.commonTags !== a.commonTags) return b.commonTags - a.commonTags;
+                // 1. スコア（共通タグ数）が多い順
+                if (b.score !== a.score) return b.score - a.score;
                 // 2. 日付が新しい順
                 return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
-            })
-            .slice(0, 3) // 上位3件
-            .map(item => item.post);
+            });
+
+        // 上位3件を取得
+        const related = relatedCandidates.slice(0, 3).map(item => item.post);
 
         return {
             params: { slug: post.id },
             props: {
                 post,
-                // 2. インデックスを元に「一つ前（古い）」と「一つ後（新しい）」を特定
-                prev: posts[index + 1], 
-                next: posts[index - 1],
+                prev: sortedPosts[index + 1], 
+                next: sortedPosts[index - 1],
                 relatedPosts: related,
             },
         };

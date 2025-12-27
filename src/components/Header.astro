@@ -1,5 +1,7 @@
 ---
 import { SITE_TITLE } from '../consts';
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
 import HeaderLink from './HeaderLink.astro';
 ---
 
@@ -48,6 +50,7 @@ import HeaderLink from './HeaderLink.astro';
 					></path></svg
 				>
 			</a>
+
 		</div>
 	</nav>
 </header>
@@ -55,8 +58,9 @@ import HeaderLink from './HeaderLink.astro';
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: white;
+		background: var(--header-bg);
 		box-shadow: 0 2px 8px rgba(var(--black), 5%);
+		transition: background-color 0.3s ease;
 	}
 	h2 {
 		margin: 0;

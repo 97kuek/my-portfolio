@@ -1,0 +1,92 @@
+---
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const tags = allPosts
+    .flatMap((post) => post.data.tags || [])
+    .filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
+
+const tagCounts = tags.reduce((acc, tag) => {
+    acc[tag] = (acc[tag] || 0) + 1;
+    return acc;
+}, {} as Record<string, number>);
+
+const uniqueTags = Object.keys(tagCounts).sort();
+
+// フォントサイズの計算用
+const maxCount = Math.max(...Object.values(tagCounts));
+const minCount = Math.min(...Object.values(tagCounts));
+
+const getFontSize = (count: number) => {
+    if (maxCount === minCount) return '1rem';
+    // 0.8rem ～ 1.5rem の範囲でサイズを調整
+    const size = 0.8 + ((count - minCount) / (maxCount - minCount)) * 0.7;
+    return `${size.toFixed(2)}rem`;
+};
+
+const getOpacity = (count: number) => {
+     if (maxCount === minCount) return 1;
+     // 頻度が高いほど濃く (0.7 ~ 1.0)
+     return 0.7 + ((count - minCount) / (maxCount - minCount)) * 0.3;
+}
+---
+
+<div class="tag-cloud glass-panel">
+    <h3>Tags</h3>
+    <div class="tags">
+        {uniqueTags.map((tag) => (
+            <a 
+                href={`/tags/${tag}/`} 
+                class="tag-link"
+                style={`font-size: ${getFontSize(tagCounts[tag])}; opacity: ${getOpacity(tagCounts[tag])};`}
+            >
+                <span class="hash">#</span>{tag}
+                <span class="count">({tagCounts[tag]})</span>
+            </a>
+        ))}
+    </div>
+</div>
+
+<style>
+    .tag-cloud {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+    }
+    .tag-cloud h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        color: rgb(var(--black));
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--glass-border);
+        padding-bottom: 0.5rem;
+    }
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        align-items: baseline;
+    }
+    .tag-link {
+        text-decoration: none;
+        color: rgb(var(--gray-dark));
+        transition: all 0.2s ease;
+        line-height: 1;
+    }
+    .tag-link:hover {
+        color: var(--accent);
+        transform: translateY(-2px);
+    }
+    .hash {
+        color: var(--accent);
+        opacity: 0.6;
+        margin-right: 1px;
+    }
+    .count {
+        font-size: 0.7em;
+        opacity: 0.6;
+        margin-left: 2px;
+    }
+</style>

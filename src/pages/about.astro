@@ -105,7 +105,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	.lead {
 		font-size: 1.1em;
 		line-height: 1.8;
-		color: #333;
+		color: rgb(var(--gray-dark));
 	}
 	.divider {
 		border: 0;
@@ -134,7 +134,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	}
 	.skill-category h3 {
 		font-size: 1rem;
-		color: #666;
+		color: rgb(var(--gray));
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -145,13 +145,13 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		gap: 0.6rem;
 	}
 	.tag {
-		background: rgba(255,255,255,0.8);
-		color: #333;
+		background: var(--glass-bg);
+		color: rgb(var(--black));
 		padding: 0.4rem 1rem;
 		border-radius: 50px;
 		font-size: 0.9rem;
 		font-weight: 500;
-		border: 1px solid rgba(255,255,255,0.5);
+		border: 1px solid var(--glass-border);
 		transition: all 0.3s ease;
 		box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 	}
@@ -160,7 +160,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		color: #fff;
 		border-color: var(--accent);
 		transform: translateY(-3px);
-		box-shadow: 0 5px 15px rgba(35, 55, 255, 0.3); /* Glow effect */
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Glow effect */
 	}
 
 	/* --- タイムラインのデザイン --- */
@@ -209,7 +209,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	/* ホバー時に丸の色を変える */
 	.timeline-item:hover .timeline-marker {
 		border-color: var(--accent);
-		background: #fff;
+		background: var(--header-bg);
 	}
 	
 	@keyframes pulse {
@@ -238,7 +238,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	}
 	.detail {
 		font-size: 0.95rem;
-		color: #555;
+		color: rgb(var(--gray-dark));
 		margin: 0;
 		line-height: 1.6;
 	}

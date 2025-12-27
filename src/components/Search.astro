@@ -1,0 +1,67 @@
+---
+import '@pagefind/default-ui/css/ui.css';
+---
+
+<div id="search" class="search-container"></div>
+
+<script>
+    import { PagefindUI } from '@pagefind/default-ui';
+
+    // View Transitions対応: ページ遷移ごとに再初期化
+    document.addEventListener('astro:page-load', () => {
+        const searchContainer = document.querySelector('#search');
+        if (searchContainer) {
+            searchContainer.innerHTML = ''; // クリアして再生成
+            new PagefindUI({
+                element: '#search',
+                showSubResults: true,
+                showImages: false,
+                translations: {
+                    placeholder: '記事を検索...',
+                    clear_search: 'クリア',
+                    zero_results: '"[SEARCH_TERM]" の検索結果はありません',
+                    many_results: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
+                    one_result: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    .search-container {
+        margin-bottom: 2rem;
+        --pagefind-ui-scale: 0.8;
+        --pagefind-ui-primary: var(--accent);
+        --pagefind-ui-text: rgb(var(--gray-dark));
+        --pagefind-ui-background: var(--glass-bg);
+        --pagefind-ui-border: var(--glass-border);
+        --pagefind-ui-tag: rgba(var(--gray-light), 0.5);
+        --pagefind-ui-border-width: 1px;
+        --pagefind-ui-border-radius: 8px;
+        --pagefind-ui-font: 'Outfit', sans-serif;
+    }
+
+    /* Pagefindのデフォルトスタイルを微調整 */
+    :global(.pagefind-ui__search-input) {
+        background-color: var(--glass-bg) !important;
+        border: 1px solid var(--glass-border) !important;
+        color: rgb(var(--black)) !important;
+    }
+    :global(.pagefind-ui__drawer) {
+        background-color: var(--glass-bg) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    :global(.pagefind-ui__result) {
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+    :global(.pagefind-ui__result-title) {
+        color: var(--accent) !important;
+    }
+    :global(.pagefind-ui__result-excerpt) {
+        color: rgb(var(--gray)) !important;
+    }
+</style>

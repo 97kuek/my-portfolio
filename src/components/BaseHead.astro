@@ -3,6 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
+import { ClientRouter } from 'astro:transitions';
 import FallbackImage from '../assets/blog-placeholder-1.jpg';
 import { SITE_TITLE } from '../consts';
 
@@ -15,12 +16,27 @@ interface Props {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const { title, description, image = FallbackImage } = Astro.props;
+
+// Helper to determine the OG image
+let ogImage = new URL(image.src, Astro.site);
+// If we are on a blog post page (but not the index), use the dynamic OG image
+if (Astro.url.pathname.startsWith('/blog/') && Astro.url.pathname !== '/blog/') {
+	// Remove trailing slash if present for cleaner URL generation, assuming slug matches file path
+	const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+	if (slug) {
+		ogImage = new URL(`/og/${slug}.png`, Astro.site);
+	}
+	if (slug) {
+		ogImage = new URL(`/og/${slug}.png`, Astro.site);
+	}
+}
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<ClientRouter />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
 	rel="alternate"
@@ -52,11 +68,11 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:image" content={ogImage} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+<meta property="twitter:image" content={ogImage} />
