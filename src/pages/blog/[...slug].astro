@@ -4,7 +4,9 @@ import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
 // 1. 全記事を取得し、日付順（新しい順）に並べ替える
-    const posts = await getCollection('blog');
+    const posts = await getCollection('blog', ({ data }) => {
+        return import.meta.env.PROD ? data.draft !== true : true;
+    });
     const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 	return sortedPosts.map((post, index) => {

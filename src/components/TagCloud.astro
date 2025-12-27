@@ -1,7 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('blog');
+const allPosts = await getCollection('blog', ({ data }) => {
+    return import.meta.env.PROD ? data.draft !== true : true;
+});
 const tags = allPosts
     .flatMap((post) => post.data.tags || [])
     .filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
