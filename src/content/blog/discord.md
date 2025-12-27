@@ -1,7 +1,7 @@
 ---
 title: 'Node.jsで自分専用のDiscordボットを作る'
 description: 'Node.jsとdiscord.jsを使ってボットを作成します。トークン管理など、セキュリティの基本を最初からしっかり押さえた手順解説です。'
-pubDate: '2025-12-20'
+pubDate: '2025-08-20'
 tags: ['Discord', 'Node.js', 'Bot', '環境構築']
 ---
 
