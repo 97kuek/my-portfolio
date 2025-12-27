@@ -29,6 +29,29 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	</div>
 
 	<div class="content-block fade-in-up" style="animation-delay: 0.2s;">
+		<h2>Projects</h2>
+        <div class="project-grid">
+            <a href="https://github.com/97kuek/my-portfolio" target="_blank" class="project-card glass-panel">
+                <h3>My Portfolio</h3>
+                <p>現在ご覧のこのサイトです。Astro, React, Glassmorphism Designを用いて構築しました。</p>
+                <div class="project-tags">
+                    <span class="tag-badge">Astro</span>
+                    <span class="tag-badge">TypeScript</span>
+                </div>
+            </a>
+            
+            <a href="https://wasa-birdman.com/" target="_blank" class="project-card glass-panel">
+                <h3>WASA Birdman Project</h3>
+                <p>早稲田大学鳥人間プロジェクト。主翼制作および空力解析を担当しています。</p>
+                <div class="project-tags">
+                    <span class="tag-badge">Engineering</span>
+                    <span class="tag-badge">Teamwork</span>
+                </div>
+            </a>
+        </div>
+	</div>
+
+	<div class="content-block fade-in-up" style="animation-delay: 0.3s;">
 		<h2>Skills & Interests</h2>
 		<p style="margin-bottom: 2rem;">数値解析，画像処理，3Dモデリングの自動化などを中心に扱っています．</p>
 		
@@ -242,4 +265,48 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		margin: 0;
 		line-height: 1.6;
 	}
+
+    /* --- プロジェクトカード --- */
+    .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .project-card {
+        display: block;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border-color: var(--accent);
+    }
+    .project-card h3 {
+        font-size: 1.2rem;
+        margin: 0 0 0.5rem 0;
+        color: var(--accent);
+    }
+    .project-card p {
+        font-size: 0.95rem;
+        color: rgb(var(--gray-dark));
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    .project-tags {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .tag-badge {
+        font-size: 0.75rem;
+        background: rgba(var(--accent), 0.1);
+        color: var(--accent);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-weight: bold;
+    }
 </style>

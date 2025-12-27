@@ -24,6 +24,21 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
 <html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json" set:html={JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": title,
+            "image": [new URL(heroImage?.src ?? '/og-image.png', Astro.site).toString()],
+            "datePublished": pubDate.toISOString(),
+            "dateModified": updatedDate?.toISOString() ?? pubDate.toISOString(),
+            "author": [{
+                "@type": "Person",
+                "name": "Keitaro Ueki",
+                "url": Astro.site
+            }]
+        })} />
 
 		<style>
 			/* --- レイアウト全体 --- */

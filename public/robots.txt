@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://97kuek.vercel.app/sitemap-index.xml
