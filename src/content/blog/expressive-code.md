@@ -44,21 +44,7 @@ export default defineConfig({
 
 基本的にはこれだけで導入完了です！
 
-## 3. 実際に使ってみる
-ここからは、**Markdownファイル**で実際にコードを書いてみましょう。
-
-```markdown
-```js title="example.js"
-console.log('Hello World');
-```
-```
-
-きっと以下のように表示されるはずです。
-```js title="example.js"
-console.log('Hello World');
-```
-
-### 4. テーマのカスタマイズ
+## 3. テーマのカスタマイズ
 デフォルトでも十分綺麗ですが、好みに合わせてカスタマイズできます。`astro.config.mjs`にオプションを追加します。。
 
 ```javascript

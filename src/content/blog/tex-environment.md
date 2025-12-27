@@ -1,5 +1,5 @@
 ---
-title: 'VSCodeとTeXで最強のレポート作成環境を作る（2025年版）'
+title: 'VSCodeとTeXで最強のレポート作成環境を作る'
 description: 'インストールするだけじゃ動かない！？VSCodeのsettings.json設定まで完全網羅。Ctrl+Sで自動ビルドされる快適なTeX環境を構築します。'
 pubDate: '2025-08-26'
 heroImage: '../../assets/TeX.png'
