@@ -2,9 +2,11 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
-// 1. 追加: 数式プラグインをインポート
+// 1. 追加: 数式プラグインとTOC用プラグインをインポート
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 import expressiveCode from 'astro-expressive-code';
 
@@ -19,9 +21,9 @@ export default defineConfig({
         },
     }), mdx(), sitemap()],
 
-    // 2. 追加: ここで数式プラグインを有効化します
+    // 2. 追加: ここで数式プラグインとTOC用プラグインを有効化します
     markdown: {
         remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
+        rehypePlugins: [rehypeKatex, rehypeSlug, rehypeAutolinkHeadings],
     },
 });

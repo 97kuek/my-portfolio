@@ -18,7 +18,7 @@ interface Props extends CollectionEntry<'blog'>['data'] {
     headings?: { depth: number; slug: string; text: string }[];
 }
 
-const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost, relatedPosts, headings } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost, relatedPosts, headings, tags } = Astro.props;
 ---
 
 <html lang="ja">
@@ -113,6 +113,31 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
+            
+            /* --- Tech Stack (Tags) --- */
+            .tech-stack {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                margin-bottom: 0.5rem;
+            }
+            .tech-badge {
+                background: rgba(var(--accent), 0.1);
+                color: var(--accent);
+                border: 1px solid rgba(var(--accent), 0.2);
+                padding: 0.25em 0.8em;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                text-decoration: none;
+                transition: all 0.2s;
+                font-weight: 500;
+            }
+            .tech-badge:hover {
+                background: var(--accent);
+                color: white;
+                transform: translateY(-1px);
+            }
 
             /* --- 目次 --- */
             .toc {
@@ -331,6 +356,15 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
                                 • <span id="reading-time">計算中...</span>
                             </span>
 						</div>
+                        {tags && tags.length > 0 && (
+                            <div class="tech-stack">
+                                {tags.map(tag => (
+                                    <a href={`/tags/${tag}/`} class="tech-badge">
+                                        {tag}
+                                    </a>
+                                ))}
+                            </div>
+                        )}
 						<h1>{title}</h1>
 						<hr />
 					</div>
@@ -390,7 +424,6 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
 
 					<Giscuss />
 				</div>
-			</article>
 			</article>
 		</main>
 		<Footer />

@@ -146,12 +146,14 @@ const posts = (await getCollection('blog')).sort(
 		display: flex;
 		flex-direction: column-reverse;
 		align-items: center;
-		gap: 2rem;
-		padding: 3rem 2rem;
+		gap: 3rem;
+		padding: 4rem 2rem;
 		text-align: center;
-		background: radial-gradient(circle at center, rgba(35, 55, 255, 0.05), transparent 70%);
-		border-radius: 20px;
-		margin-bottom: 2rem;
+		background: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+		border-radius: 24px;
+		margin-bottom: 4rem;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
 	}
 	
 	@media (min-width: 768px) {
@@ -159,7 +161,7 @@ const posts = (await getCollection('blog')).sort(
 			flex-direction: row;
 			justify-content: space-between;
 			text-align: left;
-			padding: 5rem 0;
+			padding: 5rem 3rem;
 		}
 		.hero-content {
 			flex: 1;
@@ -169,13 +171,14 @@ const posts = (await getCollection('blog')).sort(
 			display: flex;
 			justify-content: center;
 			align-items: center;
+            perspective: 1000px;
 		}
 	}
 
 	.greeting {
 		color: var(--accent);
-		font-weight: bold;
-		letter-spacing: 0.05em;
+		font-weight: 800;
+		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		font-size: 0.9rem;
 		display: block;
@@ -184,11 +187,11 @@ const posts = (await getCollection('blog')).sort(
 
 	/* ★タイピングアニメーションのスタイル */
 	.typewriter-container {
-		font-family: 'Courier New', Courier, monospace; /* 等幅フォント */
-		font-size: 1.2rem;
+		font-family: 'JetBrains Mono', monospace; /* Tech font */
+		font-size: 1.4rem;
 		font-weight: bold;
 		color: rgb(var(--gray));
-		margin-bottom: 0.5rem;
+		margin-bottom: 1rem;
 		min-height: 1.5em; /* ガタつき防止 */
 	}
 	.typing-text {
@@ -196,8 +199,8 @@ const posts = (await getCollection('blog')).sort(
 	}
 	.cursor {
 		display: inline-block;
-		width: 2px;
-		background-color: rgb(var(--black));
+		width: 3px;
+		background-color: var(--accent);
 		animation: blink 1s step-end infinite;
 		margin-left: 2px;
 	}
@@ -207,27 +210,33 @@ const posts = (await getCollection('blog')).sort(
 	}
 
 	h1 {
-		font-size: 3rem;
+		font-size: 3.5rem;
 		line-height: 1.1;
 		margin: 0.2em 0 0.5em 0;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.03em;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
 	}
 
 	.bio {
-		font-size: 1.1rem;
+		font-size: 1.2rem;
 		font-weight: bold;
 		margin-bottom: 0.5em;
+        color: rgb(var(--gray-dark));
 	}
 	.description {
 		color: rgb(var(--gray));
-		line-height: 1.6;
-		margin-bottom: 2rem;
+		line-height: 1.8;
+		margin-bottom: 2.5rem;
+        font-size: 1.05rem;
 	}
 
 	/* ボタン */
 	.links {
 		display: flex;
-		gap: 1rem;
+		gap: 1.5rem;
 		justify-content: center;
 	}
 	@media (min-width: 768px) {
@@ -235,67 +244,74 @@ const posts = (await getCollection('blog')).sort(
 	}
 
 	.button {
-		padding: 0.8rem 1.5rem;
+		padding: 0.9rem 2rem;
 		text-decoration: none;
 		border-radius: 50px;
 		font-weight: bold;
-		transition: all 0.2s ease;
-		font-size: 0.95rem;
+		transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+		font-size: 1rem;
+        letter-spacing: 0.05em;
+        position: relative;
+        overflow: hidden;
 	}
 	.primary {
-		background: rgb(var(--black));
-		color: var(--header-bg); /* Use background color for text contrast */
-		box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+		background: var(--accent);
+		color: #fff; 
+		box-shadow: 0 4px 15px rgba(35, 55, 255, 0.3);
+        border: 1px solid transparent;
 	}
 	.primary:hover {
-		background: var(--accent);
-		color: #fff;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-	}
-	.secondary {
-		background: transparent;
-		color: #333;
-		border: 1px solid #ddd;
-	}
-	.secondary:hover {
-		background: #f4f4f5;
-		border-color: #bbb;
+		background: var(--accent-dark);
+		transform: translateY(-4px);
+		box-shadow: 0 8px 25px rgba(35, 55, 255, 0.4);
 	}
 
-	/* ★画像のスタイル調整 */
+    /* Visual */
 	.image-wrapper {
-		/* 必要に応じて背景装飾を追加可能 */
 		position: relative;
+        transform-style: preserve-3d;
 	}
 	
-	/* AstroのImageコンポーネントに適用されるクラス */
 	.profile-img {
-		width: 280px;
-		height: 280px;
+		width: 300px;
+		height: 300px;
 		object-fit: cover;
 		border-radius: 50%; /* 丸くする */
-		box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* 影をつける */
-		border: 4px solid #fff; /* 白い枠線 */
+		box-shadow: 0 20px 40px rgba(0,0,0,0.1); /* 影をつける */
+		border: 4px solid #fff; 
 		position: relative;
 		z-index: 2;
+        transition: transform 0.5s;
 	}
+    
+    .profile-img:hover {
+        transform: scale(1.05) rotate(2deg);
+        border-color: var(--accent);
+    }
+
 	.profile-glow {
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 300px;
-		height: 300px;
-		background: radial-gradient(circle, rgba(35, 55, 255, 0.2) 0%, transparent 70%);
+		width: 340px;
+		height: 340px;
+		background: radial-gradient(circle, rgba(35, 55, 255, 0.1) 0%, transparent 70%);
 		border-radius: 50%;
 		z-index: 1;
+        animation: pulse-glow 4s infinite alternate;
 	}
+    
+    @keyframes pulse-glow {
+        0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+        100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
 
 	.divider {
-		margin: 3rem 0;
+		margin: 4rem 0;
 		border: 0;
 		border-top: 1px solid #eee;
+        opacity: 0.5;
 	}
 
 	/* --- 記事カードグリッド --- */
@@ -303,47 +319,68 @@ const posts = (await getCollection('blog')).sort(
 		display: flex;
 		justify-content: space-between;
 		align-items: baseline;
-		margin-bottom: 2rem;
+		margin-bottom: 2.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
 	}
 	.view-all {
-		font-size: 0.9rem;
+		font-size: 0.95rem;
 		color: var(--accent);
 		text-decoration: none;
+        font-weight: bold;
+        transition: color 0.2s;
 	}
+    .view-all:hover {
+        color: var(--accent-dark);
+        text-decoration: underline;
+    }
 	
 	.card-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 2rem;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 2.5rem;
 	}
 
 	.card {
 		text-decoration: none;
 		color: inherit;
-		border-radius: 12px;
+		border-radius: 16px;
 		overflow: hidden;
-		transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-		background: var(--glass-bg); /* Use variable */
-		border: 1px solid var(--glass-border);
+		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		background: #fff; 
+		border: 1px solid rgba(0,0,0,0.05);
 		opacity: 0; /* for animation */
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 	}
 	.card:hover {
-		transform: translateY(-8px) scale(1.02);
-		box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-		border-color: var(--accent);
+		transform: translateY(-10px);
+		box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.01);
+		border-color: rgba(35, 55, 255, 0.1);
 	}
+    
+    .card:hover .date {
+        color: var(--accent);
+    }
 
 	.card-image {
 		width: 100%;
-		height: 160px;
-		background: rgba(var(--gray-light), 0.5);
+		height: 180px;
+		background: #f1f5f9;
 		overflow: hidden;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
 	}
 	.card-image img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+        transition: transform 0.5s ease;
 	}
+    .card:hover .card-image img {
+        transform: scale(1.1);
+    }
+    
 	.no-image {
 		height: 100%;
 		display: flex;
@@ -354,15 +391,25 @@ const posts = (await getCollection('blog')).sort(
 	}
 
 	.card-content {
-		padding: 1.2rem;
+		padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
 	}
 	.card-content h3 {
 		margin: 0.5rem 0 0;
-		font-size: 1.1rem;
+		font-size: 1.25rem;
 		line-height: 1.4;
+        color: rgb(var(--black));
+        transition: color 0.2s;
 	}
+    .card:hover h3 {
+        color: var(--accent);
+    }
 	.date {
 		font-size: 0.85rem;
-		color: #888;
+		color: rgb(var(--gray));
+        font-family: 'JetBrains Mono', monospace;
+        transition: color 0.3s;
 	}
 </style>

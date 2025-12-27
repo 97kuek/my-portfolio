@@ -5,26 +5,38 @@
  */
 
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
+	/* Light Theme Palette */
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
 	--gray-dark: 34, 41, 57;
+
+	/* Modern Accents */
+	--accent: #2337ff;
+	/* Vivid Blue */
+	--accent-secondary: #00d2ff;
+	/* Cyan */
+	--accent-dark: #000d8a;
+
+	/* Gradients */
 	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px rgba(var(--gray), 33%);
+	--primary-gradient: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+
+	/* Shadows & Glass */
+	--box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+	--card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
 	/* New Variables */
 	--font-heading: 'Outfit', sans-serif;
-	--primary-gradient: linear-gradient(135deg, #2337ff 0%, #000d8a 100%);
+
+	/* Light Glassmorphism */
 	--glass-bg: rgba(255, 255, 255, 0.7);
 	--glass-border: rgba(255, 255, 255, 0.5);
-	--glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-	--header-bg: #ffffff;
+	--glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+	--header-bg: rgba(255, 255, 255, 0.85);
+
+	--bg-color: #fafafa;
 }
-
-
 
 @font-face {
 	font-family: "Atkinson";
@@ -47,8 +59,13 @@ body {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
+
+	/* Clean Light Background */
+	background-color: var(--bg-color);
+	background-image:
+		radial-gradient(circle at 10% 20%, rgba(239, 246, 255, 1) 0%, transparent 20%),
+		radial-gradient(circle at 90% 80%, rgba(240, 249, 255, 1) 0%, transparent 20%);
+
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
@@ -58,7 +75,7 @@ body {
 }
 
 main {
-	width: 720px;
+	width: 800px;
 	max-width: calc(100% - 2em);
 	margin: auto;
 	padding: 3em 1em;
@@ -74,11 +91,17 @@ h6 {
 	color: rgb(var(--black));
 	line-height: 1.2;
 	font-family: var(--font-heading);
-	letter-spacing: -0.02em;
+	letter-spacing: -0.01em;
+	text-shadow: none;
 }
 
 h1 {
 	font-size: 3.052em;
+	background: var(--primary-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	display: inline-block;
 }
 
 h2 {
@@ -87,6 +110,7 @@ h2 {
 
 h3 {
 	font-size: 1.953em;
+	color: var(--accent);
 }
 
 h4 {
@@ -100,14 +124,19 @@ h5 {
 strong,
 b {
 	font-weight: 700;
+	color: rgb(var(--black));
 }
 
 a {
 	color: var(--accent);
+	text-decoration: none;
+	transition: all 0.2s ease;
 }
 
 a:hover {
-	color: var(--accent);
+	color: var(--accent-dark);
+	text-decoration: underline;
+	text-shadow: none;
 }
 
 p {
@@ -118,13 +147,22 @@ p {
 	margin-bottom: 2em;
 }
 
-textarea {
+textarea,
+input {
 	width: 100%;
 	font-size: 16px;
+	background: #fff;
+	border: 1px solid var(--gray-light);
+	color: rgb(var(--black));
+	padding: 10px;
+	border-radius: 8px;
+	transition: border-color 0.2s;
 }
 
-input {
-	font-size: 16px;
+textarea:focus,
+input:focus {
+	outline: none;
+	border-color: var(--accent);
 }
 
 table {
@@ -134,34 +172,49 @@ table {
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 8px;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
+	padding: 3px 6px;
+	background-color: #f1f5f9;
+	border-radius: 4px;
+	color: #0f172a;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 0.9em;
+	border: 1px solid #e2e8f0;
 }
 
 pre {
 	padding: 1.5em;
-	border-radius: 8px;
+	border-radius: 12px;
+	background: #1e293b !important;
+	/* Dark syntax highlighting looks good on light theme too */
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 pre>code {
 	all: unset;
+	color: #f8f8f2;
 }
 
 blockquote {
 	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
+	padding: 10px 20px;
+	margin: 2em 0;
+	font-size: 1.2em;
+	background: #f8fafc;
+	border-radius: 0 8px 8px 0;
+	color: rgb(var(--gray-dark));
+	font-style: italic;
 }
 
 hr {
 	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
+	border-top: 1px solid var(--gray-light);
+	margin: 2rem 0;
 }
 
 @media (max-width: 720px) {
@@ -182,13 +235,9 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
 	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
 
@@ -208,16 +257,46 @@ hr {
 }
 
 .fade-in-up {
-	animation: fadeInUp 0.8s ease-out forwards;
+	animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Glassmorphism */
+/* Glassmorphism & Cyberpunk Cards */
 .glass-panel {
-	background: var(--glass-bg);
+	background: rgba(255, 255, 255, 0.8);
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
-	border: 1px solid var(--glass-border);
-	box-shadow: var(--glass-shadow);
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #cbd5e1;
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #94a3b8;
+}
+
+/* Selection */
+::selection {
+	background: rgba(35, 55, 255, 0.2);
+	color: inherit;
 }
 
 /* Floating Animation */
@@ -227,7 +306,7 @@ hr {
 	}
 
 	50% {
-		transform: translateY(-10px);
+		transform: translateY(-15px);
 	}
 
 	100% {

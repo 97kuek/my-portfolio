@@ -3,6 +3,7 @@ import { SITE_TITLE } from '../consts';
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 import HeaderLink from './HeaderLink.astro';
+import Search from './Search.astro';
 ---
 
 <header>
@@ -13,6 +14,9 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
+        <div class="search-wrapper">
+            <Search />
+        </div>
 		<div class="social-links">
 			<a href="https://x.com/97kuek_" target="_blank">
 				<span class="sr-only">Follow on X</span>
@@ -59,32 +63,52 @@ import HeaderLink from './HeaderLink.astro';
 		margin: 0;
 		padding: 0 1em;
 		background: var(--header-bg);
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-		transition: background-color 0.3s ease;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+		transition: all 0.3s ease;
+        position: sticky;
+        top: 0;
+        z-index: 100;
 	}
 	h2 {
 		margin: 0;
-		font-size: 1em;
+		font-size: 1.2em;
+        font-weight: 700;
 	}
 
 	h2 a,
 	h2 a.active {
 		text-decoration: none;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
 	}
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+        height: 70px;
 	}
 	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
+		padding: 0.5em 1em;
+		color: rgb(var(--gray-dark));
+		border-bottom: 2px solid transparent;
 		text-decoration: none;
+        transition: all 0.2s;
+        font-weight: 500;
 	}
+	nav a:hover {
+        color: var(--accent);
+        background: rgba(var(--accent), 0.05);
+        border-radius: 6px;
+    }
 	nav a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
+        color: var(--accent);
 	}
 	.social-links,
 	.social-links a {
@@ -95,4 +119,10 @@ import HeaderLink from './HeaderLink.astro';
 			display: none;
 		}
 	}
+    
+    .search-wrapper {
+        margin-left: auto; /* Push to right, before social links */
+        margin-right: 1.5rem;
+        min-width: 220px;
+    }
 </style>
