@@ -1,129 +1,144 @@
 ---
-title: 【第1弾】Node.jsで自分専用のDiscordボットを作ってみよう！
-description: 'Node.jsとdiscord.jsを使って、自分専用のDiscordボットを作成・設定する方法を解説します。'
+title: '【Node.js】自分専用のDiscordボットを作る（セキュリティ配慮版）'
+description: 'Node.jsとdiscord.jsを使ってボットを作成します。トークン管理など、セキュリティの基本を最初からしっかり押さえた手順解説です。'
 pubDate: '2025-12-20'
-tags: ['設定', 'Discord', '技術解説']
+tags: ['Discord', 'Node.js', 'Bot', '環境構築']
 ---
 
-### はじめに
+## はじめに
 
-こんにちは！みなさんはDiscordを使ったことはあるでしょうか？
+Discordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作って自動化できることです。
+特定の言葉に反応させたり、決まった時間に通知を送ったり、アイデア次第で何でもできます。
 
-Discordとは、**音声・ビデオ・テキストを用いてリアルタイムで交流できる**プラットフォームです。ちなみに私はサークル活動などで頻繁に使用しています。
+今回は、「こんにちは」と話しかけると返事をしてくれるシンプルなボットを作りながら、**Node.jsでのボット開発の基礎** と **安全なトークン管理** の方法を解説します。
 
-LINE と違って Discord は**拡張性が高い**というのが1つのメリットです。その代表例が**ボット**です。ボットは、一言でいうと Discord 上で自動的に作業を行ってくれるプログラムのことです。**サーバー管理の自動化**や**情報の通知と連携**など、様々な便利な機能を自動化してくれます。Discord には**MEE6**や**ProBot**など、世界中で使用されている多機能ボットが存在しますが、もっと**カスタマイズ性を持ったボット**を作りたい人に向けて、**自分専用のボットを作ってみよう**と思います。今回は第1弾として、**「こんにちは」に返信する最小限のコードを実装したボット**を作っていきたいと思います。
+---
 
-## Discord Developer Portalでのボット登録
+## 1. Discord Developer Portal での設定
 
-コードを書く前に、まずは**Discordの運営側にボットを登録する**必要があります。
+まずは「ボットのアカウント」を作成します。
 
-1. **[Discord Developer Portal](https://discord.com/developers/applications)** にログインし、**New Application**を作成します。
-2. **Botタブ**から**Token**を取得します。※Tokenはボットの「パスワード」です。絶対に他人に教えたり、GitHubなどで公開したりしないでください。
-3. **Privileged Gateway Intentsの設定**:
-ここが一番の落とし穴です。**同じくBotタブにある** **`MESSAGE CONTENT INTENT`** を必ず **ON** にしてください。これを忘れると、ボットがメッセージの内容を読み取ることができません。
+1.  [Discord Developer Portal](https://discord.com/developers/applications) にアクセスし、ログインします。
+2.  右上の **New Application** をクリックし、名前（例: MyFirstBot）を入力して作成します。
+3.  左メニューの **Bot** を選び、**Reset Token** をクリックしてトークンを表示・コピーします。
+    > [!CAUTION]
+    > **この「トークン」はボットのパスワードです。**
+    > **絶対に他人に教えたり、X(Twitter)やGitHubにそのまま貼り付けたりしないでください。**
+    > 万が一漏れた場合は、すぐに Reset Token してください。
 
-## 「こんにちは」に返信する最小限のコード
+4.  **【超重要】Intents（権限）の設定**
+    同じBot設定ページの少し下に **Privileged Gateway Intents** という項目があります。
+    ここで **Message Content Intent** を **ON** にして、下の「Save Changes」を押してください。
+    *   これを忘れると、ボットがユーザーのメッセージの中身（「こんにちは」など）を読めず、反応できません。
 
-環境が整ったら、いよいよプログラミングです。
-適当な場所にプロジェクト用のフォルダを作成してターミナルを開き、以下のコマンドを実行します。
+5.  **サーバーへの招待**
+    左メニュー **OAuth2** > **URL Generator** を選びます。
+    *   **SCOPES**: `bot` にチェック
+    *   **BOT PERMISSIONS**: `Send Messages`, `Read Message History` など必要なものにチェック（テストなら `Administrator` でも可ですが、実運用では絞りましょう）
+    発行されたURLをブラウザで開き、自分のサーバーにボットを招待します。
+
+---
+
+## 2. プロジェクトの作成とセキュリティ準備
+
+ここからがプログラミングです。
+今回は「トークンをコードに直接書かない」という、安全な開発の基本ルール（`.env`管理）を最初から守って作ります。
+
+### フォルダとライブラリの準備
+
+ターミナル（PowerShellやVSCodeのターミナル）を開き、以下のコマンドを順番に実行してください。
 
 ```bash
+# 1. フォルダを作る
+mkdir my-discord-bot
+cd my-discord-bot
+
+# 2. プロジェクトの初期化（Enter連打でOK）
 npm init -y
-npm install discord.js
 
+# 3. 必要なライブラリを入れる
+# discord.js: ボット操作用
+# dotenv: トークンを隠して管理するためのライブラリ
+npm install discord.js dotenv
 ```
-最初のコマンドは、プロジェクトを開始する際の初期化コマンドです。`-y`は`yes`の略で、プロジェクトの基本情報を記述する手間を省くことができます。これを実行すると、`package.json`というファイルが作成されます。2個目のコマンドは、Discord を操作するためのライブラリを自分のパソコンにダウンロードするコマンドです。
 
-コマンドを打ち終えたら、フォルダ内に `index.js` というファイルを作成し、以下のコードを記述します。
+### トークンの設定 (.env)
+
+プロジェクトフォルダの中に、`.env` （ドット・エンブ）という名前でファイルを作ります。
+ここに、先ほどコピーしたトークンを貼り付けます。
+
+```ini title=".env"
+DISCORD_TOKEN=ここにコピーしたトークンを貼り付け
+```
+
+> [!TIP]
+> もしGitで管理する場合は、必ず `.gitignore` ファイルを作り、中に `.env` と書いて、このファイルがアップロードされないようにしましょう。
+
+---
+
+## 3. ボットのプログラム作成 (index.js)
+
+フォルダ内に `index.js` を作成し、以下のコードを書きます。
 
 ```javascript title="index.js"
-const { Client, GatewayIntentBits } = require('discord.js');
-
-// ボットが受け取る情報の種類を設定
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,           // サーバーとの接続
-        GatewayIntentBits.GuildMessages,    // メッセージの検知
-        GatewayIntentBits.MessageContent,   // メッセージ内容の取得
-    ]
-});
-
-// 起動確認
-client.once('ready', () => {
-    console.log(`ログインしました！: ${client.user.tag}`);
-});
-
-// 返信ロジック
-client.on('messageCreate', (message) => {
-    if (message.author.bot) return; // 自分の発言には反応しない
-
-    if (message.content === 'こんにちは') {
-        message.reply('こんにちは！Node.jsで動いていますよ！');
-    }
-});
-
-// 取得したトークンでログイン
-client.login('YOUR_BOT_TOKEN_HERE');
-
-```
-
-最後に、ターミナルで以下のコマンドを実行しましょう。
-
-``` bash
-node index.js
-```
-
-ボットがオンラインになれば成功です！
-
-## 補足
-今回のindex.jsはDiscordのトークンをそのまま記述しているため、GitHubなどで公開する際には注意が必要です。
-トークンを安全に管理するには、`.env`ファイルを用いてトークンを管理する方法があります。まずは、.envファイルを実行するのに必要な`dotenv`ライブラリを追加でインストールしましょう。ターミナルで以下を実行してください。
-
-``` bash
-npm install dotenv
-```
-
-実行し終えたら、`package.json`と同じ階層に`.env`ファイルを作成し、以下のように記述してください。
-
-``` .env title=".env"
-DISCORD_TOKEN=YOUR_BOT_TOKEN_HERE
-```
-
-次に、index.jsを以下のように修正してください
-
-```javascript title="index.js"
+// 必要な機能を読み込み
 const { Client, GatewayIntentBits } = require('discord.js');
 const dotenv = require('dotenv');
+
+// .envファイルの設定を読み込む
 dotenv.config();
 
-// ボットが受け取る情報の種類を設定
+// クライアント（ボット）の作成
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,           // サーバーとの接続
-        GatewayIntentBits.GuildMessages,    // メッセージの検知
-        GatewayIntentBits.MessageContent,   // メッセージ内容の取得
+        GatewayIntentBits.Guilds,           // サーバーの基本情報
+        GatewayIntentBits.GuildMessages,    // メッセージの受信
+        GatewayIntentBits.MessageContent,   // メッセージ内容の読み取り（重要！）
     ]
 });
 
-// 起動確認
+// 起動したときの処理
 client.once('ready', () => {
-    console.log(`ログインしました！: ${client.user.tag}`);
+    console.log(`${client.user.tag} としてログインしました！`);
 });
 
-// 返信ロジック
+// メッセージを受け取ったときの処理
 client.on('messageCreate', (message) => {
-    if (message.author.bot) return; // 自分の発言には反応しない
+    // ボット自身の発言には反応しない（無限ループ防止）
+    if (message.author.bot) return;
 
+    // メッセージ内容が「こんにちは」だった場合
     if (message.content === 'こんにちは') {
-        message.reply('こんにちは！Node.jsで動いていますよ！');
+        message.reply('こんにちは！Node.jsで動いていますよ！🤖');
     }
 });
 
-// 取得したトークンでログイン
+// ログイン実行
+// コードに直接書かず、process.env から読み込むので安全！
 client.login(process.env.DISCORD_TOKEN);
 ```
 
-これで、`.gitignore`ファイルに`.env`を追加することで、トークンを安全に管理することができました。
+---
+
+## 4. 実行してみよう！
+
+ターミナルで以下のコマンドを実行します。
+
+```bash
+node index.js
+```
+
+ターミナルに「〇〇 としてログインしました！」と表示されれば起動成功です。
+Discordサーバーで「こんにちは」と入力してみてください。ボットが返事をしてくれるはずです！
 
 ## まとめ
-今回は簡易的なボットの作成方法を紹介しました。機会があれば次回は、スラッシュコマンドを実装したボット、外部APIを使用したボットなど、より複雑なボットの作成方法を紹介したいと思います！それでは！
+
+今回は以下の手順でボットを作成しました。
+
+1.  Developer Portalでボットを作り、**Message Content Intent** をONにする。
+2.  `npm install discord.js dotenv` で環境を作る。
+3.  `.env` ファイルでトークンを安全に管理する。
+4.  `index.js` でロジックを書き、起動する。
+
+この「`.env` で秘密情報を管理する」というやり方は、ボット開発だけでなくWeb開発全般で必須の知識です。
+ぜひ覚えておいてくださいね！
