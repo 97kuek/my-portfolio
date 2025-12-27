@@ -231,10 +231,69 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
 					grid-template-columns: 1fr;
 				}
 			}
+
+            /* --- 読了プログレスバー --- */
+            .reading-progress-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: transparent;
+                z-index: 1000;
+                pointer-events: none;
+            }
+
+            .reading-progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, var(--accent), #a37be7);
+                width: 0%;
+                transition: width 0.1s ease-out;
+            }
+
+            /* --- Back to Top ボタン --- */
+            .back-to-top {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 3rem;
+                height: 3rem;
+                background: rgba(var(--gray-dark), 0.8);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(20px);
+                transition: all 0.3s ease;
+                z-index: 900;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+
+            .back-to-top.visible {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .back-to-top:hover {
+                background: require('var(--accent)'); /* var(--accent) を使う場合 */
+                background: rgb(var(--accent));
+                transform: translateY(-4px);
+            }
 		</style>
 	</head>
 
 	<body>
+        <!-- 読了プログレスバー -->
+        <div class="reading-progress-container">
+            <div class="reading-progress-bar" id="reading-progress-bar"></div>
+        </div>
+
 		<Header />
 		<main>
             <Breadcrumbs />
@@ -317,28 +376,72 @@ const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost,
 					<Giscuss />
 				</div>
 			</article>
+			</article>
 		</main>
 		<Footer />
-        <script>
-            // 推定読了時間の計算
-            function calculateReadingTime() {
-                const articleBody = document.querySelector('.prose');
-                if (!articleBody) return;
 
-                const text = articleBody.textContent || '';
-                const wordCount = text.length;
-                const readingTime = Math.ceil(wordCount / 500); // 1分あたり500文字と仮定
+        <!-- Back to Top Button -->
+        <button id="back-to-top" class="back-to-top" aria-label="Topへ戻る">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        </button>
+        <script>
+            // スクロール関連のロジック
+            function initScrollEffects() {
+                // --- 読了時間計算 (既存) ---
+                const articleBody = document.querySelector('.prose');
+                if (articleBody) {
+                    const text = articleBody.textContent || '';
+                    const wordCount = text.length;
+                    const readingTime = Math.ceil(wordCount / 500);
+                    const readingTimeElement = document.getElementById('reading-time');
+                    if (readingTimeElement) {
+                        readingTimeElement.textContent = `約 ${readingTime} 分で読めます`;
+                    }
+                }
+
+                // --- プログレスバー & Back to Top ---
+                const progressBar = document.getElementById('reading-progress-bar');
+                const backToTopBtn = document.getElementById('back-to-top');
                 
-                const readingTimeElement = document.getElementById('reading-time');
-                if (readingTimeElement) {
-                    readingTimeElement.textContent = `約 ${readingTime} 分で読めます`;
+                function handleScroll() {
+                    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    
+                    // プログレスバーの更新
+                    if (progressBar && docHeight > 0) {
+                        const scaffold = (scrollTop / docHeight) * 100;
+                        progressBar.style.width = `${scaffold}%`;
+                    }
+
+                    // Back to Top ボタンの表示切り替え
+                    if (backToTopBtn) {
+                        if (scrollTop > 300) {
+                            backToTopBtn.classList.add('visible');
+                        } else {
+                            backToTopBtn.classList.remove('visible');
+                        }
+                    }
+                }
+
+                // スクロールイベントの登録
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                handleScroll(); // 初期化時にも実行
+
+                // Back to Top クリックイベント
+                if (backToTopBtn) {
+                    backToTopBtn.addEventListener('click', () => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
                 }
             }
 
             // ページロード時とView Transition時に実行
-            document.addEventListener('astro:page-load', calculateReadingTime);
-            // 通常のロード用
-            document.addEventListener('DOMContentLoaded', calculateReadingTime);
+            document.addEventListener('astro:page-load', initScrollEffects);
         </script>
 	</body>
 </html>

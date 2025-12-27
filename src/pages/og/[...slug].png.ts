@@ -7,7 +7,7 @@ import path from 'path';
 
 export async function getStaticPaths() {
     const posts = await getCollection('blog', ({ data }) => {
-        return import.meta.env.PROD ? data.draft !== true : true;
+        return import.meta.env.PROD ? (data as any).draft !== true : true;
     });
     return posts.map((post) => ({
         params: { slug: post.id },
@@ -16,7 +16,10 @@ export async function getStaticPaths() {
 }
 
 export const GET: APIRoute = async ({ props }) => {
-    const post = props;
+    // propsの型は CollectionEntry<'blog'> ですが、Astroの型推論がうまくいかない場合があるため
+    // 必要に応じて any キャストなどで回避するか、型定義を明示します。
+    // ここでは単純に props をそのまま使いますが、linterが文句を言う場合は以下のようにします。
+    const post = props as any; // Temporary workaround for type inference issue
 
     // Load font
     const fontPath = path.resolve('./public/fonts/atkinson-bold.woff');
@@ -98,7 +101,7 @@ export const GET: APIRoute = async ({ props }) => {
     const resvg = new Resvg(svg);
     const image = resvg.render();
 
-    return new Response(image.asPng(), {
+    return new Response(image.asPng() as any, { // Cast to any to bypass BodyInit mismatch with Buffer
         headers: {
             'Content-Type': 'image/png',
         },

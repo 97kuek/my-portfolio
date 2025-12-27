@@ -1,0 +1,78 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`404 Not Found | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				min-height: 60vh;
+				text-align: center;
+                padding: 3rem 1rem;
+			}
+            
+            .glass-container {
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                padding: 4rem 2rem;
+                border-radius: 16px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(5px);
+                max-width: 600px;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 6rem;
+                margin: 0;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                line-height: 1;
+                font-weight: 900;
+            }
+
+            p {
+                margin: 1.5rem 0 2rem;
+                color: rgb(var(--gray-dark));
+                font-size: 1.1rem;
+            }
+
+            .home-link {
+                display: inline-block;
+                padding: 0.8rem 2rem;
+                background: rgb(var(--black)); /* ダークモードだと白、ライトだと黒 */
+                color: var(--header-bg); /* 反転色 */
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: bold;
+                transition: transform 0.2s, opacity 0.2s;
+            }
+
+            .home-link:hover {
+                transform: translateY(-2px);
+                opacity: 0.9;
+            }
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+            <div class="glass-container">
+                <h1>404</h1>
+                <p>お探しのページは見つかりませんでした。<br>削除されたか、URLが変更された可能性があります。</p>
+                <a href="/" class="home-link">ホームに戻る</a>
+            </div>
+		</main>
+		<Footer />
+	</body>
+</html>
