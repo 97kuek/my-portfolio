@@ -1,22 +1,21 @@
 ---
 title: 'VSCodeとTeXで最強のレポート作成環境を作る'
 description: 'インストールするだけじゃ動かない！？VSCodeのsettings.json設定まで完全網羅。Ctrl+Sで自動ビルドされる快適なTeX環境を構築します。'
-pubDate: '2025-08-26'
+pubDate: '2025-06-26'
 heroImage: '../../assets/TeX.png'
 categories: ['VS Code', 'LaTeX']
 ---
 
 ## はじめに
 
-理系大学生の皆さん、レポート作成でWordのレイアウト崩れにイライラしていませんか？
-「数式がきれいに書けない」「図表の番号管理が面倒」「参考文献のリストを作るのが大変」...
+理系大学生の皆さん、レポート作成でWordにイライラしていませんか？
+私が実験レポートを書いていてイライラしたのは、
 
-そんな悩みは **VSCode + TeX** で全て解決できます！
+- 数式を書くのに非常に時間がかかる
+- 図表や数式の番号管理が面倒
+- 参考文献のリストを作るのが大変
 
-ネット上には多くの情報がありますが、「インストールしたのに動かない」「日本語が出ない」「ビルドがいちいち手動で面倒」という声もよく聞きます。
-実は、VSCodeの拡張機能を入れただけでは、**日本語環境では快適に動きません**。
-
-この記事では、**初心者でも絶対に迷わない**、全自動ビルド（Ctrl+Sを押すだけ）まで含めた完璧な環境構築手順を解説します。
+そんな悩みを **TeX** で解決しましょう！TeXの環境として、Overleafのようなクラウドサービスは共同作業をするときは便利ですが、個人でレポート作成するときはVSCodeとTeXを組み合わせた方が便利です。そこで、今回はVSCodeとTeXを組み合わせた環境を構築する手順を解説します。
 
 ## 1. なぜ VSCode + TeX なのか？
 
@@ -26,31 +25,32 @@ categories: ['VS Code', 'LaTeX']
 
 ## 2. インストール手順
 
-### Step 1: TeX Live のインストール
+### 2.1 TeX Live のインストール
 まずはTeXの本体である **TeX Live** を入れます。これが一番時間がかかります。
 
 1.  [TeX Live公式サイト](https://www.tug.org/texlive/) から `install-tl-windows.exe` をダウンロード。
 2.  実行して「標準インストール」を選びます。
-    *   **注意**: 完了まで数時間かかることもあります。寝る前などに仕掛けるのがおすすめです。
+    *   **注意**: 完了まで数時間かかることもあります。
 
-### Step 2: VSCode と拡張機能のインストール
-1.  **VSCode** をインストール（まだの人）。
-2.  VSCodeを開き、拡張機能タブ（左側の■が4つのアイコン）から「**LaTeX Workshop**」を検索してインストールします。
+### 2.2 VSCode と拡張機能のインストール
+1.  まだの人は**VSCode** をインストールしてください。
+
+https://azure.microsoft.com/ja-jp/products/visual-studio-code
+
+2.  VSCodeを開き、拡張機能タブから**LaTeX Workshop**を検索してインストールしてください。
 
 ---
 
 ## 3. VSCodeの設定 (settings.json)
-LaTeX Workshopを入れただけだと、設定が不十分だったり、英語用の設定になっていて日本語のコンパイルが失敗することがあります。
-また、「保存時に自動ビルド」を確実にするためにも、以下の設定を必ず行ってください。
+LaTeX Workshopを入れただけだと、設定が不十分だったり、英語用の設定になっていて日本語のコンパイルが失敗することがあります。また、「保存時に自動ビルド」を確実にするためにも、以下の設定を必ず行ってください。
 
-### 設定ファイルの開き方
+### 3.1 設定ファイルの開き方
 1.  キーボードの `F1` キー（または `Ctrl + Shift + P`）を押す。
 2.  出てきた入力欄に `user json` と入力。
 3.  「**Preferences: Open User Settings (JSON)**」を選択します。
 
-### コピペ用設定コード
-これを開いた `settings.json` の `{ }` の中にコピペしてください。
-（すでに何か書いてある場合は、末尾にカンマ `,` をつけてから続けて貼ってください）
+### 3.2 コピペ用設定コード
+これを開いた `settings.json` の `{ }` の中にコピペしてください。（すでに何か書いてある場合は、末尾にカンマ `,` をつけてから続けて貼ってください）
 
 ```json
   // --------------- TeXの設定ここから ---------------
@@ -105,19 +105,16 @@ LaTeX Workshopを入れただけだと、設定が不十分だったり、英語
   // --------------- TeXの設定ここまで ---------------
 ```
 
-### 何をしているのか解説
-*   **tools**: `latexmk` という強力なビルドツールを使えるようにしています。これ一つで「tex → pdf」の変換を全自動でやってくれます。特に `uplatex` と `dvipdfmx` を使う設定にしているので、日本語もバッチリです。
-*   **recipes**: 定義したツールを実行する「レシピ」を作っています。
-*   **autoBuild.run**: ここを `"onFileChange"` にすることで、**Ctrl + S で保存した瞬間に勝手にビルドが走る**ようになります。これが超快適！
+settings.jsonとはVSCodeの設定ファイルになります。これでCtrl+Sで保存した瞬間に勝手にビルドが走るようになります！
 
 ---
 
 ## 4. 動作確認
 
-設定お疲れ様でした！実際に動くかテストしてみましょう。
+ここまでくれば設定は完了です。実際に動くかテストしてみましょう。
 
 1.  パソコン上の好きな場所に「report_test」などのフォルダを作ります。
-2.  VSCodeでそのフォルダを開きます（`ファイル` -> `フォルダーを開く`）。
+2.  VSCodeでそのフォルダを開きます。
 3.  `test.tex` というファイルを作成し、以下のコードを貼り付けます。
 
 ```latex
@@ -151,4 +148,8 @@ LaTeX Workshopを入れただけだと、設定が不十分だったり、英語
 
 ## 5. まとめ
 
-これで、TeXの実行環境が整いました。快適なTeXライフを！
+これで、TeXの実行環境が整いました。TeXを使いこなすには最初は沢山文法を覚えなくてはならないかもしれませんが、徐々に慣れていくと思います。TeXを学ぶにあたっておすすめの参考書やWebサイトを下に掲載しておきます！
+
+https://www.amazon.co.jp/%EF%BC%BB%E6%94%B9%E8%A8%82%E7%AC%AC9%E7%89%88%EF%BC%BDLaTeX%E7%BE%8E%E6%96%87%E6%9B%B8%E4%BD%9C%E6%88%90%E5%85%A5%E9%96%80-%E5%A5%A5%E6%9D%91-%E6%99%B4%E5%BD%A6/dp/4297138891/ref=sr_1_1?adgrpid=85472593817&dib=eyJ2IjoiMSJ9.rDOGqFYsl1e5LDwoQjEEDLwRwko2dK_IIpoNYa1RGWaoYNWwa99XbNLwaNfdeXXrsiSPSGiC4oxHtW0mHpZBNZdib53I7eaOXbhk6L9BykZseER26Tpi7ahTi2Q8imVMq8CUV7b4e9QsPel51bbj3Db2Eo1oMBhU5_d8cd3wbrc1TsJjUdeuSyIMHXCXyPEZLE8aPbfx7TCh7lQd18W_2u6l0bqGm9EaI7TnHIoykAf23LvZZM5-d96_mwObPoAZiWBG3oDkUwwTVsj5lBlHh_pnZtM_4QR2X1YKjnwvvZA.AsX7CZxGJV-fVtXWsH28PXs_gJqqtLPYaLf1nb9p64c&dib_tag=se&hvadid=665617099801&hvdev=c&hvexpln=0&hvlocphy=9198914&hvnetw=g&hvocijid=18003673759757946401--&hvqmt=e&hvrand=18003673759757946401&hvtargid=kwd-854622297295&hydadcr=27487_14701027&jp-ad-ap=0&keywords=latex+%E7%BE%8E%E6%96%87%E6%9B%B8%E4%BD%9C%E6%88%90%E5%85%A5%E9%96%80&mcid=218d499d4aec3c27ac8ed3bec76cfbdf&qid=1766917067&sr=8-1
+
+https://ja.wikibooks.org/wiki/TeX/LaTeX%E5%85%A5%E9%96%80

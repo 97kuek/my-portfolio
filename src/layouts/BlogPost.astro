@@ -441,6 +441,8 @@ const {
 
                     <ShareButtons title={title} url={Astro.url} />
 
+                    <Giscuss />
+
                     {
                         relatedPosts && relatedPosts.length > 0 && (
                             <div class="related-posts">
@@ -489,8 +491,6 @@ const {
                             )
                         }
                     </nav>
-
-                    <Giscuss />
                 </div>
             </article>
         </main>

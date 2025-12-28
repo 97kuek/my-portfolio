@@ -2,6 +2,7 @@
 title: Pythonでダウンロードフォルダを秒で整理する自動化スクリプトを作る
 description: 'Pythonでダウンロードフォルダを秒で整理する自動化スクリプトを作る方法を解説します。'
 pubDate: '2025-04-11'
+heroImage: '../../assets/python.jpg'
 categories: ['Python', 'Automation']
 ---
 
@@ -13,7 +14,7 @@ categories: ['Python', 'Automation']
 そこで今回は、**Pythonを用いてダウンロードフォルダを自動で整理するツール**をつくってみました。今回はその作成過程とコードを共有していきます。
 
 ## 今回作ったツールの仕様
-今回作成したスクリプト(`Download-Folder-Organizer`)の仕様は以下の通りです。
+今回作成したスクリプト`Download-Folder-Organizer`の仕様は以下の通りです。
 
 - **全自動検出** : 実行したユーザーのダウンロードフォルダを自動で見つける(Windows/Mac対応)
 - **拡張子で整理** : 画像、書類、音声、動画、プログラム
@@ -21,7 +22,7 @@ categories: ['Python', 'Automation']
 - **時系列で整理** : ファイルの更新日時を取得し、`2025/04`のような階層構造を自動生成して格納する。
 
 ### 実行後のイメージ
-実行すると、散らかったファイルが以下のように整然と並びます。
+実行すると、散らかったファイルが以下のように並びます。
 
 ```bash
 Downloads/
@@ -80,4 +81,4 @@ if not dest_file.exists():
 ## ソースコード(GitHub)
 作成したソースコードはGitHubで公開しています。以下のリポジトリからクローンして使用できます。
 
-[Download-Folder-Organizer](https://github.com/97kuek/Download-Folder-Organizer)
+https://github.com/97kuek/Download-Folder-Organizer

@@ -1,179 +1,211 @@
 ---
-title: '【完全解説】PythonでKindleを全ページ自動スクショしてPDF化する技術のすべて'
-description: 'Kindleで買った技術書をPDFで検索したい…そんな悩みを解決する自作ツールの開発秘話。Python + Win32API + FastAPIで実現する、泥臭くも強力な自動化のロジックを徹底解説します。'
-pubDate: '2025-12-28'
+title: 'PythonでKindleを全ページ自動スクショしてPDF化する技術のすべて'
+description: 'Kindleで買った技術書をPDFで検索したい…そんな悩みを解決する自作ツールの開発秘話。Python + Win32APIで実現'
+pubDate: '2025-10-28'
 categories: ['Python', 'FastAPI', 'Automation']
 heroImage: '../../assets/kindle.png'
 ---
 
-「Kindleで買った技術書、PDFで検索したい…」
+Kindleで買った技術書をGoodnotesを用いて書き込んだり、検索したい...
 そう思ったことはありませんか？
-市販のツールは使いにくかったり、有料だったり。
-そこで今回は、**Pythonを使ってKindle for PCを完全自動制御し、全ページをキャプチャしてPDF化するツール** を自作しました。
+今回は、**Pythonを使ってKindle for PCの全ページをキャプチャしてPDF化する全自動ツール** を自作しました。
+以下のリポジトリからダウンロードできるので、ぜひ参考にしてみてください。
 
-表面上はモダンなWebブラウザUIですが、裏側では泥臭くも強力なWindows制御技術が詰まっています。
-この記事では、具体的なコードを交えながら、その「自動化のロジック」を徹底解説します。
+## 1. 自動化の全体戦略
+
+Kindle本をPDF化するプロセスは、以下のステップに分解できます。
+
+1.  **ターゲット特定**: 起動している「Kindle for PC」のウィンドウを見つける。
+2.  **アクティブ化**: ウィンドウを最前面に持ってくる（これが意外と難しい）。
+3.  **撮影ループ**:
+    *   ページの内容をスクリーンショットとして保存。
+    *   次のページへめくる（右矢印キー）。
+    *   ページが変わったか確認する（重複検知）。
+4.  **製本**: 集めた画像を1つのPDFファイルに結合する。
+
+これを実現するために、以下のPythonライブラリを使用します。
+
+### 必要なライブラリ
+
+```bash
+pip install pywin32 pyautogui img2pdf
+```
+
+-   **pywin32 (win32gui, win32con, win32api)**: Windowsの深層（Win32 API）を操作するために必要不可欠です。ウィンドウの座標取得やフォーカス制御に使います。
+-   **pyautogui**: マウス操作やキーボード入力、スクリーンショット撮影を行う自動化ライブラリの定番です。
+-   **img2pdf**: 画像をPDFに変換するライブラリ。画質の劣化（再圧縮）なしで高速に結合できるのが特徴です。
 
 ---
 
-## 1. 自動化の全体フロー
+## 2. ターゲットウィンドウを特定する (Win32APIの活用)
 
-Kindle本をPDF化する手順は、人間がやる場合もプログラムがやる場合も同じです。
-
-1.  Kindleのウィンドウを見つける。
-2.  スクショを撮る。
-3.  次のページへめくる。
-4.  最後まで繰り返す。
-5.  集めた画像をPDFに結合する。
-
-これをPythonでどう実装するか、順に見ていきます。
-
----
-
-## 2. ターゲットウィンドウの特定 (Win32API)
-
-スクリーンショットを撮るには、まず「Kindleが画面のどこにあるか（座標）」を知る必要があります。
-これには Windows API (Win32API) を使用します。
+スクリーンショットを撮るには、まず「Kindleが画面のどこにあるか（座標）」を正確に知る必要があります。これには `EnumWindows` というAPIを使います。
 
 ### `EnumWindows` でウィンドウを探す
 
-Pythonの標準ライブラリ `ctypes` を使い、起動しているすべてのウィンドウを走査します。
+Pythonの標準ライブラリ `ctypes` または `pywin32` を使って、現在起動しているすべてのウィンドウを走査（列挙）します。
 
 ```python
-# src/window_utils.py (抜粋・簡略化)
+import ctypes
+from ctypes import windll
+
+user32 = windll.user32
 
 def get_kindle_window():
     found_window = None
 
     def callback(hwnd, extra):
-        # 1. ウィンドウタイトルを取得
+        # 1. ウィンドウのタイトルを取得
         length = user32.GetWindowTextLengthW(hwnd)
         buff = ctypes.create_unicode_buffer(length + 1)
         user32.GetWindowTextW(hwnd, buff, length + 1)
         title = buff.value
 
-        # 2. タイトルに "Kindle" が含まれているか判定
+        # 2. タイトルに "Kindle" が含まれているかチェック
         if "Kindle" in title:
-            # 3. クライアント領域（枠を除く中身）の座標を取得
-            rect = _get_client_rect_screen(hwnd)
-            found_window = WindowInfo(hwnd, title, rect)
-            return False # 見つかったらループ終了
+            # 3. クライアント領域（枠を除いた中身）の座標を取得
+            rect = wintypes.RECT()
+            user32.GetClientRect(hwnd, ctypes.byref(rect))
+            
+            # 座標変換: ウィンドウ内の相対座標 -> スクリーン全体の絶対座標
+            pt = wintypes.POINT()
+            pt.x = rect.left
+            pt.y = rect.top
+            user32.ClientToScreen(hwnd, ctypes.byref(pt))
+            
+            # 結果を保存
+            left, top = pt.x, pt.y
+            width = rect.right - rect.left
+            height = rect.bottom - rect.top
+            
+            print(f"発見: {title} @ ({left}, {top}, {width}x{height})")
+            return False # 見つかったら探索終了
         return True
 
+    # コールバック関数を登録して実行
+    callback_func = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)(callback)
     user32.EnumWindows(callback_func, 0)
-    return found_window
 ```
 
-ポイントは `GetWindowRect` ではなく `GetClientRect` を使う点です。
-OS標準の枠（タイトルバーなど）を含めてスクショしてしまうと、後でPDFにした時に見栄えが悪いからです。
-`ClientToScreen` を使って、ウィンドウ内のローカル座標をスクリーン全体の絶対座標に変換しています。
+**技術的なポイント:**
+*   **`GetWindowRect` vs `GetClientRect`**: 単なる `GetWindowRect` だと、ウィンドウの「タイトルバー」や「枠」まで座標に含まれてしまいます。綺麗なPDFを作るために、中身だけを取得できる `GetClientRect` を使い、その後に `ClientToScreen` でスクリーン座標に変換するという一手間を加えています。
 
 ---
 
-## 3. ウィンドウを強制的に「最前面」へ
+## 3. ウィンドウを強制的に「最前面」へ (Focus Stealing)
 
-スクショを撮る瞬間、ウィンドウは隠れていてはいけません。
-しかし、Windows 10/11には**フォアグラウンドロック**という機能があり、バックグラウンドのプログラムが勝手に最前面に来ることを防いでいます。
+ここが自動化の最大の難所です。スクショを撮るにはKindleを最前面にする必要がありますが、Windows 10/11には**フォアグラウンドロック**という機能があり、プログラムが勝手に最前面に来ることを防いでいます（作業中に突然別のウィンドウが出てくると邪魔だからです）。
 
-これを突破するために、**「入力スレッドのアタッチ (`AttachThreadInput`)」** というテクニックを使います。
+これを正攻法で突破するには、**「入力スレッドのアタッチ (`AttachThreadInput`)」** というハックを使います。
 
 ```python
-# src/window_utils.py
+import win32process
+import win32gui
+import win32api
+import win32con
 
-def activate_window(hwnd: int):
+def activate_window(hwnd):
     # 現在アクティブなウィンドウのスレッドIDを取得
-    current_tid = kernel32.GetCurrentThreadId()
-    target_tid = user32.GetWindowThreadProcessId(hwnd, None)
+    current_tid = win32api.GetCurrentThreadId()
+    # KindleウィンドウのスレッドIDを取得
+    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    target_tid = win32process.GetWindowThreadProcessId(hwnd)[0] # 修正: 上記行はプロセスID取得、ここではスレッドIDが必要
+
+    # 自分のスレッドとKindleのスレッドを「接続」する
+    win32process.AttachThreadInput(current_tid, target_tid, True)
     
-    # 自分のスレッドと相手のスレッドを「接続」する
-    # これにより、OSは「ユーザーが操作している一連の流れ」と認識する
-    user32.AttachThreadInput(current_tid, target_tid, True)
+    # 接続することで、OSは「ユーザーが操作している一連の流れ」と認識し、
+    # 権限が共有されるため、前面に出せるようになる
+    win32gui.SetForegroundWindow(hwnd)
+    win32gui.SetFocus(hwnd)
     
-    # ここなら SetForegroundWindow が通る！
-    user32.SetForegroundWindow(hwnd)
-    
-    # 切断
-    user32.AttachThreadInput(current_tid, target_tid, False)
+    # 処理が終わったら切断（後始末）
+    win32process.AttachThreadInput(current_tid, target_tid, False)
 ```
 
-この処理を入れることで、ボタン一つで確実にKindleが手前に来る「プロの挙動」を実現しています。
+この処理を入れることで、Pythonスクリプトから確実にKindleをたたき起こして最前面に持ってくることができます。
 
 ---
 
-## 4. スクリーンショットとページめくり (Automation Loop)
+## 4. 撮影とページめくりのループ (Automation)
 
-座標が分かれば、あとはループ処理です。
-画像処理ライブラリ `pyautogui` を使います。
+準備が整ったら、あとはひたすら「撮る→めくる」を繰り返します。
 
 ```python
-# src/automation.py (ロジック解説)
+import pyautogui
+import time
+import os
 
-def run_loop(self):
+def capture_loop(region, output_dir, max_pages=500):
     previous_image_bytes = None
-
-    for i in range(self.pages):
-        # 1. 指定座標をキャプチャ
-        screenshot = pyautogui.screenshot(region=self.region)
+    
+    for i in range(max_pages):
+        # 1. 指定座標をキャプチャ (pyautoguiは内部でPillowを使用)
+        screenshot = pyautogui.screenshot(region=region)
         
-        # 2. 【重要】自動停止の仕組み (重複検出)
-        # 画像データをバイト列として比較し、前回と全く同じなら「最終ページ」と判断
+        # 2. 【重要】自動停止ロジック (重複検出)
+        # 画像データをバイト列に変換して比較。前回と全く同じなら「最終ページ」と判断。
         current_bytes = screenshot.tobytes()
         if previous_image_bytes and current_bytes == previous_image_bytes:
-            print("ページが変化していません。終了します。")
+            print("ページの変化がありません。終了します。")
             break
         previous_image_bytes = current_bytes
 
-        # 3. 保存
-        filename = f"page_{i:04d}.png"
-        screenshot.save(os.path.join(self.output_dir, filename))
+        # 3. 保存 (連番ファイル名)
+        filename = f"page_{i:03d}.png"
+        save_path = os.path.join(output_dir, filename)
+        screenshot.save(save_path)
 
-        # 4. ページめくり
-        # Kindle for PC は右矢印キーで次ページへ行ける
+        # 4. ページめくり (右矢印キー)
         pyautogui.press('right')
         
-        # 5. 描画待ち (環境によるが0.5秒程度あれば十分)
-        time.sleep(self.delay)
+        # 5. 待機 (ページ遷移アニメーションや読み込み待ち)
+        time.sleep(0.5) 
 ```
 
-### こだわりポイント：重複検出による自動停止
-ページ数を事前に「200ページ」などと正確に入れなくてもいいように、**「画面が変わらなくなったら終了」** というロジックを入れています。
-これは `screenshot.tobytes()` で画像の生データを比較するだけで実装でき、非常に実用的です。
+### 工夫した点: ページ数の自動判定
+最初、「全ページ数を入力させる」仕様にしていましたが、面倒なので**「画面が変わらなくなったら終了」**というロジックに変更しました。`screenshot.tobytes()` で画像の生データを比較するだけなので、計算コストも低く、非常に確実に動作します。
 
 ---
 
-## 5. 画像を束ねてPDF化
+## 5. 画像を劣化なしでPDF化 (img2pdf)
 
-最後に、フォルダに溜まった大量のPNG画像を1つのPDFにします。
-ここでは `input2pdf` というライブラリが優秀です。
+最後に、保存した大量のPNG画像を1つのPDFファイルにまとめます。
+ここでは `Pillow` ではなく、**`img2pdf`** を使うのが正解です。
 
 ```python
-# src/pdf_maker.py
+import img2pdf
 
-def create_pdf(image_list, output_path):
-    # img2pdfは無劣化かつ高速にPDFコンテナに画像を格納してくれる
-    with open(output_path, "wb") as f:
-        f.write(img2pdf.convert(image_list))
+def make_pdf(image_folder, output_pdf_name):
+    # 画像リストを作成 (ファイル名順にソート)
+    images = sorted([
+        os.path.join(image_folder, f) 
+        for f in os.listdir(image_folder) 
+        if f.endswith(".png")
+    ])
+
+    print("PDFを作成中...")
+    with open(output_pdf_name, "wb") as f:
+        # 画像データを再エンコードせず、そのままPDFコンテナに格納
+        f.write(img2pdf.convert(images))
+    print("完了！")
 ```
 
-`Pillow` (PIL) でもPDF化は可能ですが、再圧縮がかかって画質が落ちたり、処理が重かったりします。
-`img2pdf` は画像のバイナリデータをそのままPDFの規格に埋め込むだけなので、**爆速かつオリジナル画質のまま** PDF化できます。漫画や技術書には必須の選択です。
+`Pillow` などを使ってPDF化すると、画像がいったんデコードされ、再度JPEG圧縮などがかかって画質が落ちたり、ファイルサイズが巨大化したりすることがあります。
+`img2pdf` は画像のバイナリデータをそのままPDFの規格に合わせて埋め込むだけなので、**オリジナル画質を完全に維持したまま、爆速で**PDF化できます。
 
 ---
 
-## 6. まとめ
+## 6. まとめと今後の展望
 
-このように、KindleのPDF化ツールは、実は以下の基本的な技術の組み合わせでできています。
+このように、デスクトップアプリの自動操作は、Webスクレイピングとはまた違った「OSレベルの制御」が必要になり、泥臭い工夫が求められます。しかし、一度作ってしまえば「どんな電子書籍リーダーでも（ブラウザ版でもアプリ版でも）」応用が効く強力な武器になります。
 
-1.  **Win32API**: ウィンドウを見つけ、制御する。
-2.  **PyAutoGUI**: 画面を見て、キーを叩く。
-3.  **バイナリ比較**: 終了判定を行う。
-4.  **img2pdf**: 高速にまとめる。
+今後の展望としては、以下のような改良を考えています。
 
-今回はこれに **FastAPI + WebSocket** を被せることで、「ブラウザから操作できるモダンなアプリ」に仕立て上げました。
-Pythonはこうした「低レイヤーのOS操作」と「高レベルなWeb技術」をシームレスに繋げるのが本当に得意ですね。
+1.  **GUI化**: コマンドラインではなく、ボタン一つで操作できるようにする（完了：FastAPI + ReactでWeb UIを作りました）。
+2.  **範囲選択の自動化**: 現在は座標を自動取得していますが、手動で微調整できるモードも追加したい。
+3.  **OCR連携**: PDF化した後にOCRをかけて、テキスト検索可能にする。
 
-ソースコードはGitHubで公開していますので、ぜひ自分好みに改造してみてください！
+ソースコード全体はGitHubで公開しています。もし興味があれば、Starをつけてもらえると嬉しいです！
 
 [GitHub: Kindle-To-PDF-Web-Automation](https://github.com/97kuek/Kindle-PDF-Converter)
-
-https://github.com/97kuek/Kindle-PDF-Converter

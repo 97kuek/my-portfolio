@@ -2,23 +2,27 @@
 title: 'Node.jsで自分専用のDiscordボットを作る'
 description: 'Node.jsとdiscord.jsを使ってボットを作成します。トークン管理など、セキュリティの基本を最初からしっかり押さえた手順解説です。'
 pubDate: '2025-08-20'
+heroImage: '../../assets/discord.jpg'
 categories: ['Node.js', 'Discord.js']
 ---
 
 ## はじめに
 
-Discordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作って自動化できることです。
+みなさん、Discordは使ったことはありますか？私は、サークルなどの進捗管理ツールとして利用しています。一般的には、ゲーム中のボイスチャットなどでも使われることも多いと思います。
+
+LINEなどのSNSと違うDiscordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作って自動化できることです。
 特定の言葉に反応させたり、決まった時間に通知を送ったり、アイデア次第で何でもできます。
 
 今回は、「こんにちは」と話しかけると返事をしてくれるシンプルなボットを作りながら、**Node.jsでのボット開発の基礎**を解説します。
-
----
 
 ## 1. Discord Developer Portal での設定
 
 まずは「ボットのアカウント」を作成します。
 
-1.  [Discord Developer Portal](https://discord.com/developers/applications) にアクセスし、ログインします。
+1.  Discord Developer Portalにアクセスし、ログインします。
+
+https://discord.com/developers/applications 
+
 2.  右上の **New Application** をクリックし、名前（例: MyFirstBot）を入力して作成します。
 3.  左メニューの **Bot** を選び、**Reset Token** をクリックしてトークンを表示・コピーします。
 4.  **Intents（権限）の設定**
@@ -31,16 +35,15 @@ Discordの魅力の一つは、誰でも簡単に **Bot（ボット）** を作�
     *   **BOT PERMISSIONS**: `Send Messages`, `Read Message History` など必要なものにチェック（テストなら `Administrator` でも可ですが、実運用では絞りましょう）
     発行されたURLをブラウザで開き、自分のサーバーにボットを招待します。
 
----
-
 ## 2. プロジェクトの作成とセキュリティ準備
 
-ここからがプログラミングです。
-今回は「トークンをコードに直接書かない」という、安全な開発の基本ルール（`.env`管理）を最初から守って作ります。
+ここからがプログラミングです。node.jsを用いるので、インストールしていない人は下のリンクからインストールしておきましょう。
 
-### フォルダとライブラリの準備
+https://nodejs.org/ja
 
-ターミナル（PowerShellやVSCodeのターミナル）を開き、以下のコマンドを順番に実行してください。
+### 2.1 フォルダとライブラリの準備
+
+ターミナルを開き、以下のコマンドを順番に実行してください。
 
 ```bash
 # 1. フォルダを作る
@@ -56,7 +59,10 @@ npm init -y
 npm install discord.js dotenv
 ```
 
-### トークンの設定 (.env)
+`npm install` コマンドは、プロジェクトに必要なライブラリをインストールするコマンドです。
+`discord.js` は、DiscordのAPIを操作するためのライブラリです。`dotenv` は、環境変数を管理するためのライブラリです。
+
+### 2.2 トークンの設定 (.env)
 
 プロジェクトフォルダの中に、`.env` （ドット・エンブ）という名前でファイルを作ります。
 ここに、先ほどコピーしたトークンを貼り付けます。
@@ -65,17 +71,16 @@ npm install discord.js dotenv
 DISCORD_TOKEN=ここにコピーしたトークンを貼り付け
 ```
 
-> [!TIP]
-> もしGitで管理する場合は、必ず `.gitignore` ファイルを作り、中に `.env` と書いて、このファイルがアップロードされないようにしましょう。
-
----
+`.env`は、環境変数を管理するためのファイルです。他の人にトークンを漏洩させないために、GitHubで共有する際は、必ず `.gitignore` ファイルを作り、中に `.env` と書いて、このファイルがアップロードされないようにしましょう。
 
 ## 3. ボットのプログラム作成 (index.js)
 
 フォルダ内に `index.js` を作成し、以下のコードを書きます。
 
 ```javascript title="index.js"
-// 必要な機能を読み込み
+// 必要な機能を読み込む
+// constは定数を定義
+// requireはライブラリを読み込む
 const { Client, GatewayIntentBits } = require('discord.js');
 const dotenv = require('dotenv');
 
@@ -87,13 +92,13 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,           // サーバーの基本情報
         GatewayIntentBits.GuildMessages,    // メッセージの受信
-        GatewayIntentBits.MessageContent,   // メッセージ内容の読み取り（重要！）
+        GatewayIntentBits.MessageContent,   // メッセージ内容の読み取り
     ]
 });
 
 // 起動したときの処理
 client.once('ready', () => {
-    console.log(`${client.user.tag} としてログインしました！`);
+    console.log(`${client.user.tag} としてログインしました！`); // ログに出力
 });
 
 // メッセージを受け取ったときの処理
@@ -108,11 +113,8 @@ client.on('messageCreate', (message) => {
 });
 
 // ログイン実行
-// コードに直接書かず、process.env から読み込むので安全！
 client.login(process.env.DISCORD_TOKEN);
 ```
-
----
 
 ## 4. 実行してみよう！
 
@@ -127,12 +129,4 @@ Discordサーバーで「こんにちは」と入力してみてください。�
 
 ## まとめ
 
-今回は以下の手順でボットを作成しました。
-
-1.  Developer Portalでボットを作り、**Message Content Intent** をONにする。
-2.  `npm install discord.js dotenv` で環境を作る。
-3.  `.env` ファイルでトークンを安全に管理する。
-4.  `index.js` でロジックを書き、起動する。
-
-この「`.env` で秘密情報を管理する」というやり方は、ボット開発だけでなくWeb開発全般で必須の知識です。
-ぜひ覚えておいてくださいね！
+今回は簡単なDiscordボットを作成しました。今回はローカルホストで動作させましたが、実際に運用する場合は、サーバー上で動作させなければなりません。以前は、Herokuなどのサービスで簡単にサーバーを借りることができたのですが、最近お金をかけなくてはならなくなったようですね...残念です。

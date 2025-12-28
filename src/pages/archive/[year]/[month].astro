@@ -1,64 +1,81 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../../components/BaseHead.astro';
-import Header from '../../../components/Header.astro';
-import Footer from '../../../components/Footer.astro';
-import FormattedDate from '../../../components/FormattedDate.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../../consts';
+import { getCollection } from "astro:content";
+import BaseHead from "../../../components/BaseHead.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../../consts";
+import PostCard from "../../../components/PostCard.astro";
+import TagCloud from "../../../components/TagCloud.astro";
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('blog', ({ data }) => {
-      return import.meta.env.PROD ? data.draft !== true : true;
-  });
-  
-  // すべての記事から「年/月」の組み合わせを抽出
-  const archiveMap = allPosts.map(post => {
-    const d = post.data.pubDate;
-    return {
-      year: d.getFullYear().toString(),
-      month: (d.getMonth() + 1).toString().padStart(2, '0')
-    };
-  });
+	const allPosts = await getCollection("blog", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
 
-  // 重複を削除
-  const uniqueMonths = Array.from(new Set(archiveMap.map(m => `${m.year}-${m.month}`)))
-    .map(s => {
-      const [year, month] = s.split('-');
-      return { year, month };
-    });
+	// すべての記事から「年/月」の組み合わせを抽出
+	const archiveMap = allPosts.map((post) => {
+		const d = post.data.pubDate;
+		return {
+			year: d.getFullYear().toString(),
+			month: (d.getMonth() + 1).toString().padStart(2, "0"),
+		};
+	});
 
-  return uniqueMonths.map(({ year, month }) => {
-    const filteredPosts = allPosts.filter((post) => {
-      const d = post.data.pubDate;
-      return d.getFullYear().toString() === year && (d.getMonth() + 1).toString().padStart(2, '0') === month;
-    }).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+	// 重複を削除
+	const uniqueMonths = Array.from(
+		new Set(archiveMap.map((m) => `${m.year}-${m.month}`)),
+	).map((s) => {
+		const [year, month] = s.split("-");
+		return { year, month };
+	});
 
-    return {
-      params: { year, month },
-      props: { posts: filteredPosts },
-    };
-  });
+	return uniqueMonths.map(({ year, month }) => {
+		const filteredPosts = allPosts
+			.filter((post) => {
+				const d = post.data.pubDate;
+				return (
+					d.getFullYear().toString() === year &&
+					(d.getMonth() + 1).toString().padStart(2, "0") === month
+				);
+			})
+			.sort(
+				(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+			);
+
+		return {
+			params: { year, month },
+			props: { posts: filteredPosts },
+		};
+	});
 }
 
 const { year, month } = Astro.params;
 const { posts } = Astro.props;
 
-// サイドバー用のデータ取得
-const allPosts = await getCollection('blog', ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+// サイドバー用のデータ取得 (Archive List)
+const allPosts = await getCollection("blog", ({ data }) => {
+	return import.meta.env.PROD ? data.draft !== true : true;
 });
-const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())].filter(Boolean);
-const months = [...new Set(allPosts.map(post => {
-    const d = post.data.pubDate;
-    return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-}))].sort().reverse();
+
+const months = [
+	...new Set(
+		allPosts.map((post) => {
+			const d = post.data.pubDate;
+			return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+		}),
+	),
+]
+	.sort()
+	.reverse();
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={`${year}年${month}月の記事一覧 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<BaseHead
+			title={`${year}年${month}月の記事一覧 | ${SITE_TITLE}`}
+			description={SITE_DESCRIPTION}
+		/>
 		<style>
 			main {
 				width: 960px;
@@ -70,22 +87,37 @@ const months = [...new Set(allPosts.map(post => {
 			.container {
 				display: grid;
 				grid-template-columns: 1fr 240px;
+				grid-template-areas:
+					"main sidebar-top"
+					"main sidebar-bottom";
 				gap: 3rem;
+				align-items: start;
+			}
+
+			/* Main Content Area */
+			.content-area {
+				grid-area: main;
+			}
+
+			/* Sidebar Areas */
+			.sidebar-top {
+				grid-area: sidebar-top;
+			}
+
+			.sidebar-bottom {
+				grid-area: sidebar-bottom;
 			}
 
 			@media (max-width: 720px) {
-				.container { grid-template-columns: 1fr; }
+				.container {
+					grid-template-columns: 1fr;
+					grid-template-areas:
+						"sidebar-top"
+						"main"
+						"sidebar-bottom";
+					gap: 2rem;
+				}
 			}
-
-            .archive-header {
-                margin-bottom: 2rem;
-                padding-bottom: 1rem;
-                border-bottom: 1px solid #eee;
-            }
-            .archive-header h2 {
-                margin: 0;
-                font-size: 1.5rem;
-            }
 
 			ul {
 				display: grid;
@@ -95,174 +127,101 @@ const months = [...new Set(allPosts.map(post => {
 				margin: 0;
 				padding: 0;
 			}
-			
-			ul li { width: 100%; }
-			
-			/* カード全体をリンクとして機能させる */
-			.card {
-				display: flex;
-				flex-direction: column;
-				text-decoration: none;
-				transition: all 0.2s ease-in-out;
-				height: 100%;
-				border-radius: 12px;
-				overflow: hidden;
-				background: #fff;
-				border: 1px solid #eee;
-				color: inherit; /* テキストの色を継承 */
-			}
 
-			.card:hover {
-				transform: translateY(-4px);
-				box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-				border-color: var(--accent);
-			}
-
-			.card-image-wrapper {
+			ul li {
 				width: 100%;
-				aspect-ratio: 16 / 9;
-				overflow: hidden;
-			}
-
-			.card img {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				transition: transform 0.3s ease;
-			}
-
-			.card:hover img {
-				transform: scale(1.05);
-			}
-
-			.content {
-				padding: 1.25rem;
-				display: flex;
-				flex-direction: column;
-				flex-grow: 1; /* コンテンツ部分を伸ばしてタグを下に固定 */
-			}
-
-			.title {
-				margin: 0.5rem 0;
-				color: #333;
-				font-size: 1.15rem;
-				line-height: 1.4;
-				font-weight: bold;
-			}
-
-			.date {
-				font-size: 0.8rem;
-				color: #888;
-				margin: 0;
-			}
-
-			/* カード内のタグ */
-			.card-tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.4rem;
-				margin-top: auto; /* 下端に寄せる */
-				padding-top: 1rem;
-			}
-			
-			.tag-badge {
-				font-size: 0.7rem;
-				background: #f0f0f5;
-				color: #555;
-				padding: 0.2rem 0.5rem;
-				border-radius: 4px;
 			}
 
 			/* サイドバー */
-			aside { display: flex; flex-direction: column; gap: 2rem; }
+			aside {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
 			.sidebar-section h3 {
 				font-size: 0.9rem;
 				text-transform: uppercase;
 				letter-spacing: 0.05em;
-				border-bottom: 2px solid #eee;
+				border-bottom: 2px solid var(--glass-border);
 				padding-bottom: 0.5rem;
 				margin-bottom: 1rem;
-				color: #666;
+				color: rgb(var(--gray));
 			}
-			.tag-list {
+			.archive-list {
 				list-style: none;
 				padding: 0;
 				display: flex;
-				flex-wrap: wrap;
+				flex-direction: column;
 				gap: 0.5rem;
 			}
-			.archive-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 			.sidebar-link {
 				font-size: 0.9rem;
 				text-decoration: none;
-				color: #444;
+				color: rgb(var(--gray-dark));
 				transition: color 0.2s;
 			}
-			.sidebar-link:hover { color: var(--accent); }
-			.tag.sidebar-link {
-				background: #eee;
-				padding: 0.2rem 0.6rem;
-				border-radius: 100px;
+			.sidebar-link:hover {
+				color: var(--accent);
 			}
 
+			/* Page Header */
+			.page-header {
+				margin-bottom: 2rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid var(--glass-border);
+			}
+			.page-header h2 {
+				margin: 0;
+				font-size: 1.5rem;
+			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
 			<div class="container">
-				<section>
-                    <div class="archive-header">
-                        <h2>{year}年{month}月の記事 ({posts.length}件)</h2>
-                    </div>
+				<section class="content-area">
+					<div class="page-header">
+						<h2>
+							Archive: <span style="color: var(--accent);"
+								>{year}/{month}</span
+							>
+						</h2>
+					</div>
+
 					<ul>
 						{
-							posts.map((post) => (
-								<li>
-									<a href={`/blog/${post.id}/`} class="card">
-										<div class="card-image-wrapper">
-											{post.data.heroImage ? (
-												<Image width={720} height={360} src={post.data.heroImage} alt="" />
-											) : (
-												<div style="background: #f0f0f0; width: 100%; height: 100%;"></div>
-											)}
-										</div>
-										<div class="content">
-											<p class="date">
-												<FormattedDate date={post.data.pubDate} />
-											</p>
-											<h4 class="title">{post.data.title}</h4>
-											
-											{post.data.tags && (
-												<div class="card-tags">
-													{post.data.tags.map((tag) => (
-														<span class="tag-badge">#{tag}</span>
-													))}
-												</div>
-											)}
-										</div>
-									</a>
-								</li>
-							))
+							posts.map((post) => {
+								return (
+									<li>
+										<PostCard post={post} />
+									</li>
+								);
+							})
 						}
 					</ul>
 				</section>
 
-				<aside>
-					<div class="sidebar-section">
-						<h3>Tags</h3>
-						<ul class="tag-list">
-							{tags.map(tag => (
-								<li><a href={`/tags/${tag}/`} class="tag sidebar-link">#{tag}</a></li>
-							))}
-						</ul>
-					</div>
+				<aside class="sidebar-top">
+					<TagCloud />
+				</aside>
+
+				<aside class="sidebar-bottom">
 					<div class="sidebar-section">
 						<h3>Archive</h3>
 						<ul class="archive-list">
-							{months.map(month => (
-								<li><a href={`/archive/${month}/`} class="sidebar-link">{month}</a></li>
-							))}
+							{
+								months.map((m) => (
+									<li>
+										<a
+											href={`/archive/${m}/`}
+											class="sidebar-link"
+										>
+											{m}
+										</a>
+									</li>
+								))
+							}
 						</ul>
 					</div>
 				</aside>
