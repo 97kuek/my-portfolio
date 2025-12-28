@@ -67,83 +67,115 @@ const { type = "modal" } = Astro.props;
 }
 
 <script>
-    // Define the logic only once or ensure it handles the modal mode
     class SiteSearch extends HTMLElement {
+        private closeBtn: HTMLButtonElement | null = null;
+        private dialog: HTMLDialogElement | null = null;
+        private dialogFrame: HTMLDivElement | null = null;
+        private isInitializing = false;
+        private abortController = new AbortController();
+
         connectedCallback() {
-            const closeBtn = this.querySelector<HTMLButtonElement>(
+            // Cleanup previous listeners if any (though connectedCallback usually implies fresh or moved)
+            this.abortController.abort();
+            this.abortController = new AbortController();
+            const signal = this.abortController.signal;
+
+            this.closeBtn = this.querySelector<HTMLButtonElement>(
                 "button[data-close-modal]",
             );
-            const dialog = this.querySelector<HTMLDialogElement>("dialog");
-            const dialogFrame =
+            this.dialog = this.querySelector<HTMLDialogElement>("dialog");
+            this.dialogFrame =
                 this.querySelector<HTMLDivElement>(".dialog-frame");
 
-            if (!closeBtn || !dialog || !dialogFrame) return;
+            if (!this.closeBtn || !this.dialog || !this.dialogFrame) return;
 
-            const onOpen = (event?: Event) => {
-                event?.preventDefault();
-                if (dialog.open) return;
-                dialog.showModal();
-                const input = dialog.querySelector<HTMLInputElement>(
-                    ".pagefind-ui__search-input",
-                );
-                if (input) {
-                    input.focus();
-                } else {
-                    setTimeout(() => {
-                        const input = dialog.querySelector<HTMLInputElement>(
-                            ".pagefind-ui__search-input",
-                        );
-                        input?.focus();
-                    }, 100);
-                }
-            };
-
-            const onClose = (event?: Event) => {
-                event?.preventDefault();
-                dialog.close();
-            };
-
-            closeBtn.addEventListener("click", onClose);
-            dialog.addEventListener("click", (e) => {
-                if (e.target === dialog) {
-                    dialog.close();
-                }
+            // Close button
+            this.closeBtn.addEventListener("click", (e) => this.onClose(e), {
+                signal,
             });
 
-            // Global Event Listener for Triggers
-            // We attach to window to catch events from any button
-            const handleOpenEvent = (e: CustomEvent) => onOpen(e);
-            window.addEventListener(
-                "open-search-modal",
-                handleOpenEvent as EventListener,
+            // Dialog backdrop click
+            this.dialog.addEventListener(
+                "click",
+                (e) => {
+                    if (e.target === this.dialog) {
+                        this.onClose();
+                    }
+                },
+                { signal },
             );
 
-            // Keyboard shortcuts
-            const handleKeydown = (e: KeyboardEvent) => {
-                if (e.key === "Escape" && dialog.open) {
-                    // default logic usually works
-                }
-                const isCmdK = (e.metaKey || e.ctrlKey) && e.key === "k";
-                const isSlash =
-                    e.key === "/" &&
-                    !["INPUT", "TEXTAREA"].includes(
-                        (e.target as HTMLElement).tagName,
-                    );
+            // Global Event Listeners
+            // Use signal to auto-remove when disconnected
+            window.addEventListener(
+                "open-search-modal",
+                (e) => this.onOpen(e),
+                { signal },
+            );
+            window.addEventListener("keydown", (e) => this.handleKeydown(e), {
+                signal,
+            });
 
-                if ((isCmdK || isSlash) && !dialog.open) {
-                    e.preventDefault();
-                    onOpen();
-                }
+            // Initialize
+            this.initPagefind();
+        }
+
+        disconnectedCallback() {
+            this.abortController.abort();
+        }
+
+        onOpen(event?: Event) {
+            event?.preventDefault();
+            if (!this.dialog || this.dialog.open) return;
+
+            this.dialog.showModal();
+
+            const focusInput = () => {
+                const input = this.dialog?.querySelector<HTMLInputElement>(
+                    ".pagefind-ui__search-input",
+                );
+                input?.focus();
             };
-            window.addEventListener("keydown", handleKeydown);
 
-            // Initialize Pagefind
-            // Using ID 'search' is okay if there is only ONE modal in the DOM.
-            const initPagefind = async () => {
-                const searchDiv = this.querySelector("#search");
-                if (!searchDiv || searchDiv.innerHTML !== "") return;
+            focusInput();
+            // Fallback if not rendered yet
+            setTimeout(focusInput, 100);
+        }
 
+        onClose(event?: Event) {
+            event?.preventDefault();
+            this.dialog?.close();
+        }
+
+        handleKeydown(e: KeyboardEvent) {
+            if (e.key === "Escape" && this.dialog?.open) {
+                // Native escape handling usually works, but explicit is fine
+            }
+
+            const isCmdK = (e.metaKey || e.ctrlKey) && e.key === "k";
+            const isSlash =
+                e.key === "/" &&
+                !["INPUT", "TEXTAREA"].includes(
+                    (e.target as HTMLElement).tagName,
+                );
+
+            if ((isCmdK || isSlash) && !this.dialog?.open) {
+                e.preventDefault();
+                this.onOpen();
+            }
+        }
+
+        async initPagefind() {
+            if (this.isInitializing) return;
+            const searchDiv = this.querySelector("#search");
+            if (!searchDiv || searchDiv.innerHTML !== "") return;
+
+            this.isInitializing = true;
+            try {
                 const { PagefindUI } = await import("@pagefind/default-ui");
+                // Double check after await
+                if (searchDiv.innerHTML !== "") return;
+
                 new PagefindUI({
                     element: searchDiv,
                     showSubResults: true,
@@ -156,13 +188,9 @@ const { type = "modal" } = Astro.props;
                         one_result: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
                     },
                 });
-            };
-
-            const loadHandler = () => initPagefind();
-            // Listen to both for robustness
-            window.addEventListener("DOMContentLoaded", loadHandler);
-            document.addEventListener("astro:page-load", loadHandler);
-            initPagefind();
+            } finally {
+                this.isInitializing = false;
+            }
         }
     }
 
@@ -170,13 +198,11 @@ const { type = "modal" } = Astro.props;
         customElements.define("site-search", SiteSearch);
     }
 
-    // Trigger Logic (applied to buttons anywhere)
-    // We check if the script has already added the listener to avoid duplicates?
-    // But this script runs inside the component. If multiple components load, valid?
-    // But 'trigger' mode doesn't render the script block? No, Astro scripts are hoisted or scoped.
-    // If the script is inside the component, it runs when component is used.
-    // We should guard the global click listener.
-    if (!window._searchTriggerListenerAttached) {
+    // Global Trigger Logic - Safe to run multiple times as it just delegates
+    // But we should ensure we don't bind multiple times if this script re-runs.
+    // In Astro, inline scripts in components might re-run.
+    // Use a unique property on window to ensure singleton.
+    if (typeof window !== "undefined" && !window.hasAttachedSearchTrigger) {
         document.addEventListener("click", (e) => {
             const target = (e.target as HTMLElement).closest(
                 "button[data-open-modal-trigger]",
@@ -185,13 +211,12 @@ const { type = "modal" } = Astro.props;
                 window.dispatchEvent(new CustomEvent("open-search-modal"));
             }
         });
-        window._searchTriggerListenerAttached = true;
+        window.hasAttachedSearchTrigger = true;
     }
-    // Add type definition to Window interface to avoid TS error?
-    // Typescript might complain but in Astro script tag it's loose or we can cast as any.
+
     declare global {
         interface Window {
-            _searchTriggerListenerAttached: boolean;
+            hasAttachedSearchTrigger?: boolean;
         }
     }
 </script>
