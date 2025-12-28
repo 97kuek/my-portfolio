@@ -1,62 +1,49 @@
 ---
-import Layout from '../layouts/BlogPost.astro'; // BlogPostレイアウトを使用
-import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.jpgをインポート
+import Layout from "../layouts/BlogPost.astro"; // BlogPostレイアウトを使用
+import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.jpgをインポート
 ---
 
 <Layout
 	title="About Me"
 	description="植木敬太郎のポートフォリオ"
-	pubDate={new Date('2025-12-16')}
+	pubDate={new Date("2025-12-16")}
 	heroImage={aboutImg}
 >
 	<div class="intro-section fade-in-up">
 		<p class="lead">
-			早稲田大学 基幹理工学部 情報通信学科<br>
-			<strong>「エンジニアリング」と「ものづくり」</strong>が好きです．<br>
+			早稲田大学 基幹理工学部 情報通信学科<br />
+			<strong>「エンジニアリング」と「ものづくり」</strong>が好きです．<br
+			/>
 			数値解析からWeb開発まで，興味の幅を広げながら技術を磨いています．
 		</p>
 	</div>
 
 	<hr class="divider" />
 
-	<div class="content-block glass-panel fade-in-up" style="animation-delay: 0.1s; padding: 2rem; border-radius: 12px;">
+	<div
+		class="content-block glass-panel fade-in-up"
+		style="animation-delay: 0.1s; padding: 2rem; border-radius: 12px;"
+	>
 		<h2>Activities</h2>
 		<p>
-			<strong>早稲田大学宇宙航空研究会 (WASA) 鳥人間プロジェクト</strong><br>
-			42代 翼班所属<br>
+			<strong>早稲田大学宇宙航空研究会 (WASA) 鳥人間プロジェクト</strong
+			><br />
+			42代 翼班所属<br />
 			鳥人間コンテスト出場を目指し，人力飛行機の主翼・尾翼の製作に励んでいます．
 		</p>
 	</div>
 
-	<div class="content-block fade-in-up" style="animation-delay: 0.2s;">
-		<h2>Projects</h2>
-        <div class="project-grid">
-            <a href="https://github.com/97kuek/my-portfolio" target="_blank" class="project-card glass-panel">
-                <h3>My Portfolio</h3>
-                <p>現在ご覧のこのサイトです。Astro, React, Glassmorphism Designを用いて構築しました。</p>
-                <div class="project-tags">
-                    <span class="tag-badge">Astro</span>
-                    <span class="tag-badge">TypeScript</span>
-                </div>
-            </a>
-            
-            <a href="https://wasa-birdman.com/" target="_blank" class="project-card glass-panel">
-                <h3>WASA Birdman Project</h3>
-                <p>早稲田大学鳥人間プロジェクト。プロジェクトマネージャーを務め、翼班として主翼・尾翼の製作を担当しています。</p>
-                <div class="project-tags">
-                    <span class="tag-badge">Engineering</span>
-                    <span class="tag-badge">Teamwork</span>
-                </div>
-            </a>
-        </div>
-	</div>
-
 	<div class="content-block fade-in-up" style="animation-delay: 0.3s;">
 		<h2>Skills & Interests</h2>
-		<p style="margin-bottom: 2rem;">数値解析，画像処理，3Dモデリングの自動化などを中心に扱っています．</p>
-		
+		<p style="margin-bottom: 2rem;">
+			数値解析，画像処理，3Dモデリングの自動化などを中心に扱っています．
+		</p>
+
 		<div class="skill-grid">
-			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
+			<div
+				class="skill-category glass-panel"
+				style="padding: 1.5rem; border-radius: 12px;"
+			>
 				<h3>Languages</h3>
 				<div class="tags">
 					<span class="tag">Python</span>
@@ -66,7 +53,10 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				</div>
 			</div>
 
-			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
+			<div
+				class="skill-category glass-panel"
+				style="padding: 1.5rem; border-radius: 12px;"
+			>
 				<h3>Engineering & Design</h3>
 				<div class="tags">
 					<span class="tag">Blender API</span>
@@ -76,7 +66,10 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				</div>
 			</div>
 
-			<div class="skill-category glass-panel" style="padding: 1.5rem; border-radius: 12px;">
+			<div
+				class="skill-category glass-panel"
+				style="padding: 1.5rem; border-radius: 12px;"
+			>
 				<h3>Web Development</h3>
 				<div class="tags">
 					<span class="tag">Astro</span>
@@ -96,7 +89,9 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				<div class="timeline-content">
 					<span class="date">2025.04 - Current</span>
 					<h3>早稲田大学 基幹理工学部 情報通信学科</h3>
-					<p class="detail">大学の進振りで第一希望の情報通信学科に進学でき，CSや通信理論を学び始める．</p>
+					<p class="detail">
+						大学の進振りで第一希望の情報通信学科に進学でき，CSや通信理論を学び始める．
+					</p>
 				</div>
 			</li>
 			<li class="timeline-item">
@@ -104,7 +99,9 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				<div class="timeline-content">
 					<span class="date">2024.04 - 2025.03</span>
 					<h3>早稲田大学 基幹理工学部 学系Ⅱ</h3>
-					<p class="detail">1年次は学科に配属されず，基礎工学全般を学習．</p>
+					<p class="detail">
+						1年次は学科に配属されず，基礎工学全般を学習．
+					</p>
 				</div>
 			</li>
 			<li class="timeline-item">
@@ -112,12 +109,13 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 				<div class="timeline-content">
 					<span class="date">2018.04 - 2024.03</span>
 					<h3>桐蔭学園中等教育学校</h3>
-					<p class="detail">幼・小・中・高一貫の学校に通う．男子校の6年間を過ごす．</p>
+					<p class="detail">
+						幼・小・中・高一貫の学校に通う．男子校の6年間を過ごす．
+					</p>
 				</div>
 			</li>
 		</ul>
 	</div>
-
 </Layout>
 
 <style>
@@ -143,7 +141,11 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		/* 見出しのデザイン強化 */
 		font-family: var(--font-heading);
 		font-size: 1.8em;
-		background: linear-gradient(120deg, transparent 60%, rgba(35, 55, 255, 0.1) 60%);
+		background: linear-gradient(
+			120deg,
+			transparent 60%,
+			rgba(35, 55, 255, 0.1) 60%
+		);
 		padding: 0 0.5rem 0.2rem;
 		margin-bottom: 1.5rem;
 		display: inline-block;
@@ -176,7 +178,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		font-weight: 500;
 		border: 1px solid var(--glass-border);
 		transition: all 0.3s ease;
-		box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 	}
 	.tag:hover {
 		background: var(--accent);
@@ -195,7 +197,7 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 	}
 	/* 左側の縦線 */
 	.timeline::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		bottom: 0;
@@ -234,11 +236,17 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		border-color: var(--accent);
 		background: var(--header-bg);
 	}
-	
+
 	@keyframes pulse {
-		0% { box-shadow: 0 0 0 0 rgba(35, 55, 255, 0.4); }
-		70% { box-shadow: 0 0 0 10px rgba(35, 55, 255, 0); }
-		100% { box-shadow: 0 0 0 0 rgba(35, 55, 255, 0); }
+		0% {
+			box-shadow: 0 0 0 0 rgba(35, 55, 255, 0.4);
+		}
+		70% {
+			box-shadow: 0 0 0 10px rgba(35, 55, 255, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(35, 55, 255, 0);
+		}
 	}
 	.pulse-marker {
 		animation: pulse 2s infinite;
@@ -265,48 +273,4 @@ import aboutImg from '../assets/about.jpg'; // assetsフォルダにあるabout.
 		margin: 0;
 		line-height: 1.6;
 	}
-
-    /* --- プロジェクトカード --- */
-    .project-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-    .project-card {
-        display: block;
-        padding: 1.5rem;
-        border-radius: 12px;
-        text-decoration: none;
-        color: inherit;
-        border: 1px solid var(--glass-border);
-        transition: all 0.3s ease;
-    }
-    .project-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        border-color: var(--accent);
-    }
-    .project-card h3 {
-        font-size: 1.2rem;
-        margin: 0 0 0.5rem 0;
-        color: var(--accent);
-    }
-    .project-card p {
-        font-size: 0.95rem;
-        color: rgb(var(--gray-dark));
-        margin-bottom: 1rem;
-        line-height: 1.5;
-    }
-    .project-tags {
-        display: flex;
-        gap: 0.5rem;
-    }
-    .tag-badge {
-        font-size: 0.75rem;
-        background: rgba(var(--accent), 0.1);
-        color: var(--accent);
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
-        font-weight: bold;
-    }
 </style>

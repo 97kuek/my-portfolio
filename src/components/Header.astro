@@ -11,10 +11,12 @@ import Search from "./Search.astro";
 		{/* Desktop Menu */}
 		<div class="desktop-menu">
 			<div class="internal-links">
-				<HeaderLink href="/">Home</HeaderLink>
-				<HeaderLink href="/blog">Blog</HeaderLink>
-				<HeaderLink href="/projects">Projects</HeaderLink>
-				<HeaderLink href="/about">About</HeaderLink>
+				<HeaderLink href="/" data-astro-prefetch>Home</HeaderLink>
+				<HeaderLink href="/blog" data-astro-prefetch>Blog</HeaderLink>
+				<HeaderLink href="/projects" data-astro-prefetch
+					>Projects</HeaderLink
+				>
+				<HeaderLink href="/about" data-astro-prefetch>About</HeaderLink>
 			</div>
 			<div class="search-wrapper">
 				<Search id="search-desktop" />

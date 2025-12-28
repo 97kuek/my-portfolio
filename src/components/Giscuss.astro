@@ -1,27 +1,41 @@
----
-// src/components/Giscuss.astro
----
+<div class="giscus"></div>
 
-<section class="giscuss-container">
-  <script src="https://giscus.app/client.js"
-        data-repo="97kuek/my-portfolio"
-        data-repo-id="R_kgDOQplb-w"
-        data-category="Announcements"
-        data-category-id="DIC_kwDOQplb-84Cz9NZ"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme="light"
-        data-lang="ja"
-        crossorigin="anonymous"
-        async>
-  </script>
-</section>
+<script is:inline>
+  // Giscusをロードする関数
+  function loadGiscus() {
+    const giscusContainer = document.querySelector(".giscus");
+    if (!giscusContainer) return;
+
+    // すでにiframeがある場合は再ロードしない（重複防止）
+    // ただし、ページ遷移でURLが変わった場合はGiscus側がiframe内でハンドリングするか、
+    // iframeを再生成する必要がある。View Transitionsの場合、Containerごと書き換わるので
+    // DOM的には新規作成されるはず。
+
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", "97kuek/my-portfolio");
+    script.setAttribute("data-repo-id", "R_kgDOQplb-w");
+    script.setAttribute("data-category", "Announcements");
+    script.setAttribute("data-category-id", "DIC_kwDOQplb-84Cz9NZ");
+    script.setAttribute("data-mapping", "pathname");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "top");
+    script.setAttribute("data-theme", "light");
+    script.setAttribute("data-lang", "ja");
+    script.setAttribute("crossorigin", "anonymous");
+    script.async = true;
+
+    giscusContainer.appendChild(script);
+  }
+
+  // View Transitions対応: ページロード時と遷移後に実行
+  document.addEventListener("astro:page-load", loadGiscus);
+</script>
 
 <style>
-  .giscuss-container {
+  .giscus {
     margin-top: 3rem;
     width: 100%;
   }

@@ -1,12 +1,28 @@
 ---
 import { getCollection } from "astro:content";
+import TechIcon from "./TechIcon.astro";
 
-const allPosts = await getCollection("blog", ({ data }) => {
+// 暫定的な型定義
+interface BlogPostData {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    heroImage?: ImageMetadata;
+    categories?: string[];
+    draft?: boolean;
+}
+
+const allPosts = await getCollection("blog", (post) => {
+    const data = post.data as unknown as BlogPostData;
     return import.meta.env.PROD ? data.draft !== true : true;
 });
+
 const categories = allPosts
-    .flatMap((post) => post.data.categories || [])
+    .flatMap((post) => (post.data as unknown as BlogPostData).categories || [])
     .filter((cat) => typeof cat === "string" && cat.trim().length > 0);
+
+const { showCount = true } = Astro.props;
 
 const categoryCounts = categories.reduce(
     (acc, cat) => {
@@ -22,33 +38,30 @@ const uniqueCategories = Object.keys(categoryCounts).sort();
 const maxCount = Math.max(...Object.values(categoryCounts));
 const minCount = Math.min(...Object.values(categoryCounts));
 
-const getFontSize = (count: number) => {
-    if (maxCount === minCount) return "1rem";
-    // 0.8rem ～ 1.5rem の範囲でサイズを調整
-    const size = 0.8 + ((count - minCount) / (maxCount - minCount)) * 0.7;
-    return `${size.toFixed(2)}rem`;
-};
+// Prepare data for the new structure
+const sortedTags = uniqueCategories
+    .map((name) => ({
+        name,
+        count: categoryCounts[name],
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-const getOpacity = (count: number) => {
-    if (maxCount === minCount) return 1;
-    // 頻度が高いほど濃く (0.7 ~ 1.0)
-    return 0.7 + ((count - minCount) / (maxCount - minCount)) * 0.3;
-};
+const newMaxCount =
+    sortedTags.length > 0 ? Math.max(...sortedTags.map((tag) => tag.count)) : 1;
 ---
 
 <div class="tag-cloud glass-panel">
     <h3>Tech Stack</h3>
     <div class="tags">
         {
-            uniqueCategories.map((cat) => (
+            sortedTags.map((tag) => (
                 <a
-                    href={`/categories/${cat}/`}
-                    class="tag-link"
-                    style={`font-size: ${getFontSize(categoryCounts[cat])}; opacity: ${getOpacity(categoryCounts[cat])};`}
+                    href={`/categories/${tag.name}/`}
+                    class="tag"
+                    style={`font-size: ${1 + (tag.count / newMaxCount) * 0.5}rem; opacity: ${0.8 + (tag.count / newMaxCount) * 0.2}`}
                 >
-                    <span class="hash">#</span>
-                    {cat}
-                    <span class="count">({categoryCounts[cat]})</span>
+                    <TechIcon name={tag.name} />
+                    {tag.name} {showCount && `(${tag.count})`}
                 </a>
             ))
         }
@@ -77,20 +90,18 @@ const getOpacity = (count: number) => {
         gap: 0.8rem;
         align-items: baseline;
     }
-    .tag-link {
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
         text-decoration: none;
         color: rgb(var(--gray-dark));
-        transition: all 0.2s ease;
+        transition: color 0.2s ease;
         line-height: 1;
     }
-    .tag-link:hover {
+    .tag:hover {
         color: var(--accent);
         transform: translateY(-2px);
-    }
-    .hash {
-        color: var(--accent);
-        opacity: 0.6;
-        margin-right: 1px;
     }
     .count {
         font-size: 0.7em;

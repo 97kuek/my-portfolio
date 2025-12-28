@@ -1,42 +1,49 @@
 ---
-import { type CollectionEntry, getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
 
 export async function getStaticPaths() {
-// 1. 全記事を取得し、日付順（新しい順）に並べ替える
-    const posts = await getCollection('blog', ({ data }) => {
+    // 1. 全記事を取得し、日付順（新しい順）に並べ替える
+    const posts = await getCollection("blog", ({ data }) => {
         return import.meta.env.PROD ? data.draft !== true : true;
     });
-    const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    const sortedPosts = posts.sort(
+        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+    );
 
-	return sortedPosts.map((post, index) => {
-        // 関連記事の算出: 同じタグを持つ記事を探す
-        const currentTags = new Set(post.data.tags || []);
-        
+    return sortedPosts.map((post, index) => {
+        // 関連記事の算出: 同じカテゴリを持つ記事を探す
+        const currentCategories = new Set(post.data.categories || []);
+
         // 関連度スコアを計算
         const relatedCandidates = sortedPosts
-            .filter(p => p.id !== post.id) // 自分自身を除外
-            .map(p => {
-                const pTags = p.data.tags || [];
-                const commonTags = pTags.filter(t => currentTags.has(t)).length;
-                return { post: p, score: commonTags };
+            .filter((p) => p.id !== post.id) // 自分自身を除外
+            .map((p) => {
+                const pCategories = p.data.categories || [];
+                const commonCategories = pCategories.filter((c) =>
+                    currentCategories.has(c),
+                ).length;
+                return { post: p, score: commonCategories };
             })
-            .filter(item => item.score > 0) // 共通タグが1つ以上あるもの
+            .filter((item) => item.score > 0) // 共通タグが1つ以上あるもの
             .sort((a, b) => {
                 // 1. スコア（共通タグ数）が多い順
                 if (b.score !== a.score) return b.score - a.score;
                 // 2. 日付が新しい順
-                return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
+                return (
+                    b.post.data.pubDate.valueOf() -
+                    a.post.data.pubDate.valueOf()
+                );
             });
 
         // 上位3件を取得
-        const related = relatedCandidates.slice(0, 3).map(item => item.post);
+        const related = relatedCandidates.slice(0, 3).map((item) => item.post);
 
         return {
             params: { slug: post.id },
             props: {
                 post,
-                prev: sortedPosts[index + 1], 
+                prev: sortedPosts[index + 1],
                 next: sortedPosts[index - 1],
                 relatedPosts: related,
             },
@@ -46,16 +53,22 @@ export async function getStaticPaths() {
 
 // Propsの型を修正
 type Props = {
-	post: CollectionEntry<'blog'>;
-	prev?: CollectionEntry<'blog'>;
-	next?: CollectionEntry<'blog'>;
-    relatedPosts?: CollectionEntry<'blog'>[];
+    post: CollectionEntry<"blog">;
+    prev?: CollectionEntry<"blog">;
+    next?: CollectionEntry<"blog">;
+    relatedPosts?: CollectionEntry<"blog">[];
 };
 
 const { post, prev, next, relatedPosts } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<BlogPost {...post.data} prevPost={prev} nextPost={next} relatedPosts={relatedPosts} headings={headings}>
-	<Content />
+<BlogPost
+    {...post.data}
+    prevPost={prev}
+    nextPost={next}
+    relatedPosts={relatedPosts}
+    headings={headings}
+>
+    <Content />
 </BlogPost>

@@ -10,6 +10,7 @@ import TagCloud from "../../components/TagCloud.astro";
 import Search from "../../components/Search.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 import { getReadingTime } from "../../utils/readingTime";
+import PostCard from "../../components/PostCard.astro";
 
 interface BlogPostData {
 	title: string;
@@ -44,7 +45,7 @@ export async function getStaticPaths() {
 }
 
 const { tag } = Astro.params;
-const category = tag;
+const category = tag || "";
 const { posts } = Astro.props;
 
 // For sidebar (archive) - reusing allPosts logic not efficient here but needed for archive count if we want it global.
@@ -108,100 +109,6 @@ const months = [
 
 			ul li {
 				width: 100%;
-			}
-
-			/* カード全体をリンクとして機能させる */
-			.card {
-				display: flex;
-				flex-direction: column;
-				text-decoration: none;
-				transition: all 0.2s ease-in-out;
-				height: 100%;
-				border-radius: 12px;
-				overflow: hidden;
-				background: var(--glass-bg);
-				border: 1px solid var(--glass-border);
-				color: inherit; /* テキストの色を継承 */
-			}
-
-			.card:hover {
-				transform: translateY(-4px);
-				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-				border-color: var(--accent);
-			}
-
-			.card-image-wrapper {
-				width: 100%;
-				aspect-ratio: 16 / 9;
-				overflow: hidden;
-			}
-
-			.card img {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				transition: transform 0.3s ease;
-			}
-
-			.card:hover img {
-				transform: scale(1.05);
-			}
-
-			.content {
-				padding: 1.25rem;
-				display: flex;
-				flex-direction: column;
-				flex-grow: 1; /* コンテンツ部分を伸ばしてタグを下に固定 */
-			}
-
-			.title {
-				margin: 0.5rem 0;
-				color: rgb(var(--black));
-				font-size: 1.15rem;
-				line-height: 1.4;
-				font-weight: bold;
-			}
-
-			.card-meta {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				font-size: 0.8rem;
-				margin-bottom: 0.2rem;
-				color: rgb(var(--gray));
-			}
-
-			.reading-time {
-				font-size: 0.8em;
-				opacity: 0.8;
-			}
-
-			.date {
-				font-size: 0.8rem;
-				color: rgb(var(--gray));
-				margin: 0;
-			}
-
-			/* カード内のタグ */
-			.card-tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.4rem;
-				margin-top: auto; /* 下端に寄せる */
-				padding-top: 1rem;
-			}
-
-			.tag-badge {
-				font-size: 0.7rem;
-				background: rgba(
-					var(--gray-light),
-					0.8
-				); /* Darker/More opaque */
-				color: rgb(var(--gray-dark));
-				padding: 0.2rem 0.5rem;
-				border-radius: 4px;
-				border: 1px solid var(--glass-border);
-				white-space: nowrap;
 			}
 
 			/* サイドバー */
@@ -269,66 +176,17 @@ const months = [
 					<div class="page-header">
 						<h2>
 							Tech Stack: <span style="color: var(--accent);"
-								>#{category}</span>
+								>#{category}</span
+							>
 						</h2>
 					</div>
 
 					<ul>
 						{
 							posts.map((post) => {
-								const data =
-									post.data as unknown as BlogPostData;
 								return (
 									<li>
-										<a
-											href={`/blog/${post.id}/`}
-											class="card"
-										>
-											<div class="card-image-wrapper">
-												<Image
-													width={720}
-													height={360}
-													src={
-														data.heroImage ||
-														defaultImage
-													}
-													alt=""
-												/>
-											</div>
-											<div class="content">
-												<div class="card-meta">
-													<p class="date">
-														<FormattedDate
-															date={
-																post.data
-																	.pubDate
-															}
-														/>
-													</p>
-													<span class="reading-time">
-														•{" "}
-														{getReadingTime(
-															post.body ?? "",
-														)}
-													</span>
-												</div>
-												<h4 class="title">
-													{post.data.title}
-												</h4>
-
-												{data.categories && (
-													<div class="card-tags">
-														{data.categories.map(
-															(cat: string) => (
-																<span class="tag-badge">
-																	{cat}
-																</span>
-															),
-														)}
-													</div>
-												)}
-											</div>
-										</a>
+										<PostCard post={post} />
 									</li>
 								);
 							})

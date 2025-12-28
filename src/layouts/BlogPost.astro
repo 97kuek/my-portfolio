@@ -10,6 +10,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import ShareButtons from "../components/ShareButtons.astro";
 import "katex/dist/katex.min.css";
 import Giscuss from "../components/Giscuss.astro";
+import PostCard from "../components/PostCard.astro";
+import TechIcon from "../components/TechIcon.astro";
 
 // Propsの型を拡張
 type Props = CollectionEntry<"blog">["data"] & {
@@ -187,6 +189,9 @@ const {
                 text-decoration: none;
                 transition: all 0.2s;
                 font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3em;
             }
             .tech-badge:hover {
                 background: var(--accent);
@@ -244,37 +249,11 @@ const {
             }
             .related-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
             }
-            .related-card {
-                text-decoration: none;
-                color: inherit;
-                display: block;
-                transition: transform 0.2s;
-            }
-            .related-card:hover {
-                transform: translateY(-2px);
-                color: var(--accent);
-            }
-            .related-image {
-                width: 100%;
-                aspect-ratio: 16/9;
-                object-fit: cover;
-                border-radius: 8px;
-                margin-bottom: 0.5rem;
-                background: rgba(var(--gray-light), 0.5);
-            }
-            .related-title {
-                font-size: 0.95rem;
-                font-weight: bold;
-                line-height: 1.4;
-                color: rgb(var(--black));
-            }
-            .related-date {
-                font-size: 0.8rem;
-                color: rgb(var(--gray));
-                margin-top: 0.25rem;
+            .related-card-wrapper {
+                height: 100%;
             }
 
             /* --- 記事前後のナビゲーション --- */
@@ -427,6 +406,7 @@ const {
                                             href={`/categories/${cat}/`}
                                             class="tech-badge"
                                         >
+                                            <TechIcon name={cat} />
                                             {cat}
                                         </a>
                                     ))}
@@ -467,30 +447,9 @@ const {
                                 <h3>関連記事</h3>
                                 <div class="related-grid">
                                     {relatedPosts.map((post) => (
-                                        <a
-                                            href={`/blog/${post.id}/`}
-                                            class="related-card"
-                                        >
-                                            {post.data.heroImage ? (
-                                                <Image
-                                                    width={300}
-                                                    height={170}
-                                                    src={post.data.heroImage}
-                                                    alt=""
-                                                    class="related-image"
-                                                />
-                                            ) : (
-                                                <div class="related-image" />
-                                            )}
-                                            <div class="related-title">
-                                                {post.data.title}
-                                            </div>
-                                            <div class="related-date">
-                                                <FormattedDate
-                                                    date={post.data.pubDate}
-                                                />
-                                            </div>
-                                        </a>
+                                        <div class="related-card-wrapper">
+                                            <PostCard post={post} />
+                                        </div>
                                     ))}
                                 </div>
                             </div>

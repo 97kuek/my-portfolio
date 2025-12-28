@@ -1,0 +1,299 @@
+---
+import { getCollection } from "astro:content";
+import BaseHead from "../../../components/BaseHead.astro";
+import Footer from "../../../components/Footer.astro";
+import Header from "../../../components/Header.astro";
+import TagCloud from "../../../components/TagCloud.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../../consts";
+import PostCard from "../../../components/PostCard.astro";
+import type { GetStaticPaths, Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+
+interface BlogPostData {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    heroImage?: ImageMetadata;
+    categories?: string[];
+    draft?: boolean;
+}
+
+export const getStaticPaths = (async ({ paginate }) => {
+    const allPosts = await getCollection("blog", (post) => {
+        const data = post.data as unknown as BlogPostData;
+        return import.meta.env.PROD ? data.draft !== true : true;
+    });
+
+    // Extract all unique categories
+    const uniqueCategories = [
+        ...new Set(
+            allPosts
+                .map(
+                    (post) =>
+                        (post.data as unknown as BlogPostData).categories || [],
+                )
+                .flat(),
+        ),
+    ].filter(Boolean);
+
+    // Generate paths for each category, with pagination
+    return uniqueCategories.flatMap((category) => {
+        const filteredPosts = allPosts
+            .filter((post) =>
+                (post.data as unknown as BlogPostData).categories?.includes(
+                    category,
+                ),
+            )
+            .sort(
+                (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+            );
+
+        return paginate(filteredPosts, {
+            params: { tag: category },
+            pageSize: 6, // Match blog list page size
+        });
+    });
+}) satisfies GetStaticPaths;
+
+type Props = {
+    page: Page<CollectionEntry<"blog">>;
+};
+
+const { page } = Astro.props;
+const { tag } = Astro.params;
+const category = tag || "";
+
+// Sidebar data (fetching again as per pattern or could be passed if optimized, but consistency with blog list)
+const globalPosts = await getCollection("blog", (post) => {
+    const data = post.data as unknown as BlogPostData;
+    return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const months = [
+    ...new Set(
+        globalPosts.map((post) => {
+            const d = post.data.pubDate;
+            return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+        }),
+    ),
+]
+    .sort()
+    .reverse();
+---
+
+<!doctype html>
+<html lang="ja">
+    <head>
+        <BaseHead
+            title={`${category}の記事一覧 | ${SITE_TITLE}`}
+            description={SITE_DESCRIPTION}
+        />
+        <style>
+            main {
+                width: 960px;
+                max-width: calc(100% - 2em);
+                margin: auto;
+                padding: 3em 1em;
+            }
+
+            .container {
+                display: grid;
+                grid-template-columns: 1fr 240px;
+                grid-template-areas:
+                    "main sidebar-top"
+                    "main sidebar-bottom";
+                gap: 3rem;
+                align-items: start;
+            }
+
+            /* Main Content Area */
+            .content-area {
+                grid-area: main;
+            }
+
+            /* Sidebar Areas */
+            .sidebar-top {
+                grid-area: sidebar-top;
+            }
+
+            .sidebar-bottom {
+                grid-area: sidebar-bottom;
+            }
+
+            @media (max-width: 720px) {
+                .container {
+                    grid-template-columns: 1fr;
+                    grid-template-areas:
+                        "sidebar-top"
+                        "main"
+                        "sidebar-bottom";
+                    gap: 2rem;
+                }
+            }
+
+            ul {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 2rem;
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            ul li {
+                width: 100%;
+            }
+
+            /* サイドバー */
+            aside {
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+            }
+            .sidebar-section h3 {
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border-bottom: 2px solid var(--glass-border);
+                padding-bottom: 0.5rem;
+                margin-bottom: 1rem;
+                color: rgb(var(--gray));
+            }
+            .tag-list {
+                list-style: none;
+                padding: 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .archive-list {
+                list-style: none;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .sidebar-link {
+                font-size: 0.9rem;
+                text-decoration: none;
+                color: rgb(var(--gray-dark));
+                transition: color 0.2s;
+            }
+            .sidebar-link:hover {
+                color: var(--accent);
+            }
+            .tag.sidebar-link {
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                padding: 0.2rem 0.6rem;
+                border-radius: 100px;
+            }
+
+            /* Page Header for specific tag */
+            .page-header {
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--glass-border);
+            }
+            .page-header h2 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+
+            /* ページネーション */
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                margin-top: 3rem;
+            }
+            .pagination a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.8rem 1.5rem;
+                border-radius: 50px;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                color: rgb(var(--black));
+                text-decoration: none;
+                transition: all 0.2s;
+                font-weight: bold;
+            }
+            .pagination a:hover {
+                background: var(--accent);
+                color: #fff;
+                transform: translateY(-2px);
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <main>
+            <div class="container">
+                <section class="content-area">
+                    <div class="page-header">
+                        <h2>
+                            Tech Stack: <span style="color: var(--accent);"
+                                >#{category}</span
+                            >
+                        </h2>
+                    </div>
+
+                    <ul>
+                        {
+                            page.data.map((post) => {
+                                return (
+                                    <li>
+                                        <PostCard post={post} />
+                                    </li>
+                                );
+                            })
+                        }
+                    </ul>
+
+                    <div class="pagination">
+                        {
+                            page.url.prev ? (
+                                <a href={page.url.prev}>&larr; Prev</a>
+                            ) : (
+                                <span />
+                            )
+                        }
+                        {
+                            page.url.next ? (
+                                <a href={page.url.next}>Next &rarr;</a>
+                            ) : (
+                                <span />
+                            )
+                        }
+                    </div>
+                </section>
+
+                <aside>
+                    <TagCloud />
+
+                    <div class="sidebar-section">
+                        <h3>Archive</h3>
+                        <ul class="archive-list">
+                            {
+                                months.map((month) => (
+                                    <li>
+                                        <a
+                                            href={`/archive/${month}/`}
+                                            class="sidebar-link"
+                                        >
+                                            {month}
+                                        </a>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>

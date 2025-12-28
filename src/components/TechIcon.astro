@@ -1,0 +1,42 @@
+---
+const { name } = Astro.props;
+
+// Simple mapping for demonstration. In a real scenario, you might want to use a library or a robust mapping.
+// Using simple inline SVGs or placeholders for now.
+const icons: Record<string, string> = {
+    Python: `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="Python"><path d="M63.86 21.66c16.03 0 24.37 6.8 24.64 19.34h-24.6v3.25h36.1c1.12-14.7-9.5-27.16-35.9-27.16C37.36 17.09 25.1 27.2 25.1 44.57c0 10.9 6.2 16.59 16.59 18.06V51.7c-9.5 0-11-2.9-11-8.54 0-7.3 5.4-12.8 17.65-12.8h15.6zm37.93 17.3c-2.43 0-4.4 1.97-4.4 4.4 0 2.43 1.97 4.4 4.4 4.4 2.43 0 4.4-1.97 4.4-4.4 0-2.43-1.97-4.4-4.4-4.4z" fill="#3776AB"/><path d="M64.67 106.34c-16.03 0-24.37-6.8-24.64-19.34h24.6v-3.25H28.53c-1.12 14.7 9.5 27.16 35.9 27.16 26.74 0 39-10.11 39-27.48 0-10.9-6.2-16.59-16.59-18.06v10.93c9.5 0 11 2.9 11 8.54 0 7.3-5.4 12.8-17.65 12.8h-15.6zm-37.93-17.3c2.43 0 4.4-1.97 4.4-4.4 0-2.43-1.97-4.4-4.4-4.4-2.43 0-4.4 1.97-4.4 4.4 0 2.43 1.97 4.4 4.4 4.4z" fill="#FFD43B"/></svg>`,
+    Astro: `<svg viewBox="0 8 327 319" fill="none" role="img" aria-label="Astro"><path fill="#FF5D01" d="M312.44 266.38L220.65 41C205.82 2.76 150.38-16.71 113.88 22.84L28.66 266.1A35.84 35.84 0 0055.65 319h183.84a36.14 36.14 0 0035.79-24.31c22.18-8.22 37.16-28.3 37.16-28.31z"/><path fill="#fff" d="M285.49 256s-16.35 21.94-40.45 30.95H58.8a22.5 22.5 0 0113-41l6.73-.24a30.43 30.43 0 01.12-3.32L105.47 51c22.08-16.14 53.6-11 70.19 11.45l57.7 139.73 7.42-.26 44.71 54.08z"/><path fill="#FF5D01" d="M129.58 135.25l-2.73 17.58a102.3 102.3 0 0013.86 1.45L129.58 135.25zm97.77 151l-43 21h-28l-8.38-1.57 6.13-28.43 73.18 9z"/></svg>`,
+    "Node.js": `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="Node.js"><path d="M64 16L16 43.2V97.6L64 124.8L112 97.6V43.2L64 16Z" fill="#339933" fill-opacity="0.1"/><path d="M64 43.2L32 60.8V97.6L64 115.2L96 97.6V60.8L64 43.2Z" fill="#339933"/><path d="M64 27.2L24 49.6V100.8L64 123.2L104 100.8V49.6L64 27.2Z" stroke="#339933" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>`, // Placeholder
+    JavaScript: `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="JavaScript"><rect width="128" height="128" rx="15" fill="#F7DF1E"/><path d="M37.8 89.6c.9 5.8 5.6 9.3 12.3 9.3 5.4 0 8.5-2.7 8.5-6.5 0-3.3-2.3-5.3-7.7-7.2l-3.3-1.1c-7.9-2.7-11.2-6.5-11.2-12 0-9 7.4-13.6 15.6-13.6 8.3 0 14.2 4.1 15.3 11.2h-7.7c-.8-3.4-3.6-5.2-7.5-5.2-4.5 0-7.7 2.4-7.7 7.2 0 4.2 2.8 5.7 8.3 7.6l3.3 1.1c9.2 3.1 11.7 7.2 11.7 13.9 0 10.4-8.8 14.1-18.1 14.1-10.4 0-17-5-17.7-13.2h7.8V89.6zm54.3 10.1c-12.7 0-18.4-6.3-19.1-17.9h8c.5 7.1 3.5 11.4 10.7 11.4 6 0 9.1-3 9.1-7.1 0-4.1-2-6-8-8.2l-2.9-1.1c-9.7-3.7-12.4-8.1-12.4-15 0-8.8 6.9-14 16.5-14 11 0 16 5.2 16.7 14.4h-7.8c-.5-5.3-2.9-8.4-8.4-8.4-5.2 0-8.2 2.6-8.2 7.1 0 3.8 1.8 5.6 7.6 7.6l2.9 1c11.1 4.2 13.8 8.6 13.8 16.3 0 10.1-6.7 14.7-18.5 14.7z" fill="#000"/></svg>`,
+    TypeScript: `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="TypeScript"><rect width="128" height="128" rx="15" fill="#3178C6"/><path d="M72.2 101.9c-14.4 0-20.9-7-21.6-20.2h15.9c.6 6.5 4 10.1 12.1 10.1 6.8 0 10.3-3.4 10.3-8 0-4.6-2.2-6.8-9-9.3l-3.3-1.2c-11-4.2-14-9.1-14-17 0-9.9 7.8-15.8 18.7-15.8 12.5 0 18.2 5.8 18.9 16.3H87.3c-.6-6-3.3-9.5-9.5-9.5-5.9 0-8.7 2.9-8.7 8 0 4.3 2 6.3 9.4 8.6l3.3 1.1c12.5 4.7 15.6 9.7 15.6 18.4 0 11.4-7.6 16.5-20.9 16.5h-4.3zm-39.7-2.3v-49H17v-13h38.2v13H39.4v49H32.5z" fill="#fff"/></svg>`,
+    Gatbsy: `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="Gatsby"><circle cx="64" cy="64" r="64" fill="#663399"/><path d="M64 16C37.5 16 16 37.5 16 64s21.5 48 48 48 48-21.5 48-48S90.5 16 64 16zm0 11c8.4 0 16.3 2.2 23.2 6.1L32 87.5C28 80.5 25.8 72.5 25.8 64c0-21.1 17.1-38.2 38.2-38.2zm-2.4 85.3c-15.5 0-29.2-9.3-35.3-22.7L82.7 33.2c12.1 6.6 20.3 19.3 20.3 33.9-.1 21.2-18.4 38.3-39.4 38.2v7z" fill="#fff"/></svg>`,
+    React: `<svg viewBox="0 0 128 128" fill="none" role="img" aria-label="React"><circle cx="64" cy="64" r="11" fill="#61DAFB"/><g stroke="#61DAFB" stroke-width="4" fill="none"><ellipse cx="64" cy="64" rx="36" ry="12"/><ellipse cx="64" cy="64" rx="36" ry="12" transform="rotate(60 64 64)"/><ellipse cx="64" cy="64" rx="36" ry="12" transform="rotate(120 64 64)"/></g></svg>`,
+    Default: `<svg viewBox="0 0 24 24" fill="none" class="icon"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    "VS Code": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>`, // Placeholder (using zap icon)
+    "C#": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" aria-label="C#"><path d="M18.6 8.5L14 4.5 14 6c-3 0-5 2.5-5 5.5s2 5.5 5 5.5h2l.5-2.5 2 .5-.5 4c0 1.1-.9 2-2 2h-3c-5 0-9-4-9-9s4-9 9-9h3l.5 2.5 2-.5 .6-2.5z"/></svg>`, // Placeholder
+    // Add more as needed
+};
+
+const icon = icons[name] || icons["Default"];
+---
+
+<span class="icon-wrapper" set:html={icon} />
+
+<style>
+    .icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1em;
+        height: 1em;
+    }
+    .icon-wrapper :global(svg) {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+    /* Preserve original colors if svg has fill defined, but allow override if needed */
+    .icon-wrapper :global(svg[fill="none"]) {
+        fill: none;
+    }
+</style>
