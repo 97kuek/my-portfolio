@@ -1,5 +1,6 @@
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import partytown from '@astrojs/partytown';
 import { defineConfig } from 'astro/config';
 
 // 1. 追加: 数式プラグインとTOC用プラグイン、リンクカードプラグインをインポート
@@ -21,7 +22,11 @@ export default defineConfig({
         frames: {
             showCopyToClipboardButton: true,
         },
-    }), mdx(), sitemap()],
+    }), mdx(), sitemap(), partytown({
+        config: {
+            forward: ["dataLayer.push"],
+        },
+    })],
 
     // 2. 追加: ここで数式プラグインとTOC用プラグインを有効化します
     markdown: {

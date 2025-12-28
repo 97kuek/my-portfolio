@@ -1,11 +1,11 @@
 ---
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
-import '../styles/global.css';
-import type { ImageMetadata } from 'astro';
-import { ClientRouter } from 'astro:transitions';
-import FallbackImage from '../assets/blog-placeholder-1.jpg';
-import { SITE_TITLE } from '../consts';
+import "../styles/global.css";
+import type { ImageMetadata } from "astro";
+import { ClientRouter } from "astro:transitions";
+import FallbackImage from "../assets/blog-placeholder-1.jpg";
+import { SITE_TITLE } from "../consts";
 
 interface Props {
 	title: string;
@@ -18,14 +18,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title, description, image = FallbackImage } = Astro.props;
 
 // Helper to determine the OG image
+// Helper to determine the OG image
 let ogImage = new URL(image.src, Astro.site);
 // If we are on a blog post page (but not the index), use the dynamic OG image
-if (Astro.url.pathname.startsWith('/blog/') && Astro.url.pathname !== '/blog/') {
+if (
+	Astro.url.pathname.startsWith("/blog/") &&
+	Astro.url.pathname !== "/blog/"
+) {
 	// Remove trailing slash if present for cleaner URL generation, assuming slug matches file path
-	const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
-	if (slug) {
-		ogImage = new URL(`/og/${slug}.png`, Astro.site);
-	}
+	const slug = Astro.url.pathname.replace(/^\/blog\//, "").replace(/\/$/, "");
 	if (slug) {
 		ogImage = new URL(`/og/${slug}.png`, Astro.site);
 	}
@@ -42,18 +43,47 @@ if (Astro.url.pathname.startsWith('/blog/') && Astro.url.pathname !== '/blog/') 
 	rel="alternate"
 	type="application/rss+xml"
 	title={SITE_TITLE}
-	href={new URL('rss.xml', Astro.site)}
+	href={new URL("rss.xml", Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
 
+<!-- Google Analytics -->
+<script
+	type="text/partytown"
+	src="https://www.googletagmanager.com/gtag/js?id=G-MEASUREMENT_ID"></script>
+<script type="text/partytown">
+	window.dataLayer = window.dataLayer || [];
+	function gtag() {
+		dataLayer.push(arguments);
+	}
+	gtag("js", new Date());
+
+	gtag("config", "G-MEASUREMENT_ID");
+</script>
+
 <!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
+<link
+	rel="preload"
+	href="/fonts/atkinson-regular.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
+/>
+<link
+	rel="preload"
+	href="/fonts/atkinson-bold.woff"
+	as="font"
+	type="font/woff"
+	crossorigin
+/>
 
 <!-- Google Fonts: Outfit -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap"
+	rel="stylesheet"
+/>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

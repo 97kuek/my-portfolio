@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import defaultImage from "../../assets/blog-placeholder-1.jpg";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
 import Footer from "../../components/Footer.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
@@ -10,23 +10,48 @@ import TagCloud from "../../components/TagCloud.astro";
 import Search from "../../components/Search.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 import { getReadingTime } from "../../utils/readingTime";
+import type { GetStaticPaths, Page } from "astro";
 
-export async function getStaticPaths({ paginate }) {
-	const allPosts = await getCollection("blog", ({ data }) => {
+// 暫定的な型定義 (Astroの型生成が遅れる場合への対応)
+interface BlogPostData {
+	title: string;
+	description: string;
+	pubDate: Date;
+	updatedDate?: Date;
+	heroImage?: ImageMetadata;
+	categories?: string[];
+	draft?: boolean;
+}
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const allPosts = await getCollection("blog", (post) => {
+		const data = post.data as unknown as BlogPostData;
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 	const sortedPosts = allPosts.sort(
 		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 	);
 	return paginate(sortedPosts, { pageSize: 6 });
-}
+}) satisfies GetStaticPaths;
+
+type Props = {
+	page: Page<CollectionEntry<"blog">>;
+};
 
 const { page } = Astro.props;
-const allPosts = await getCollection("blog", ({ data }) => {
+const allPosts = await getCollection("blog", (post) => {
+	const data = post.data as unknown as BlogPostData;
 	return import.meta.env.PROD ? data.draft !== true : true;
 }); // For sidebar (tags/archive)
 const categories = [
-	...new Set(allPosts.map((post) => post.data.categories).flat()),
+	...new Set(
+		allPosts
+			.map(
+				(post) =>
+					(post.data as unknown as BlogPostData).categories || [],
+			)
+			.flat(),
+	),
 ].filter(Boolean);
 const months = [
 	...new Set(
@@ -255,54 +280,64 @@ const months = [
 					<Search id="search-page" />
 					<ul>
 						{
-							page.data.map((post) => (
-								<li>
-									{/* URLを /blog/${post.slug}/ に変更してみる（Astroのバージョンによってidかslugか異なります） */}
-									<a href={`/blog/${post.id}/`} class="card">
-										<div class="card-image-wrapper">
-											<Image
-												width={720}
-												height={360}
-												src={
-													post.data.heroImage ||
-													defaultImage
-												}
-												alt=""
-											/>
-										</div>
-										<div class="content">
-											<div class="card-meta">
-												<p class="date">
-													<FormattedDate
-														date={post.data.pubDate}
-													/>
-												</p>
-												<span class="reading-time">
-													•{" "}
-													{getReadingTime(
-														post.body ?? "",
-													)}
-												</span>
+							page.data.map((post) => {
+								const data =
+									post.data as unknown as BlogPostData;
+								return (
+									<li>
+										{/* URLを /blog/${post.slug}/ に変更してみる（Astroのバージョンによってidかslugか異なります） */}
+										<a
+											href={`/blog/${post.id}/`}
+											class="card"
+										>
+											<div class="card-image-wrapper">
+												<Image
+													width={720}
+													height={360}
+													src={
+														data.heroImage ||
+														defaultImage
+													}
+													alt=""
+												/>
 											</div>
-											<h4 class="title">
-												{post.data.title}
-											</h4>
-
-											{post.data.categories && (
-												<div class="card-tags">
-													{post.data.categories.map(
-														(cat: string) => (
-															<span class="tag-badge">
-																{cat}
-															</span>
-														),
-													)}
+											<div class="content">
+												<div class="card-meta">
+													<p class="date">
+														<FormattedDate
+															date={
+																post.data
+																	.pubDate
+															}
+														/>
+													</p>
+													<span class="reading-time">
+														•{" "}
+														{getReadingTime(
+															post.body ?? "",
+														)}
+													</span>
 												</div>
-											)}
-										</div>
-									</a>
-								</li>
-							))
+												<h4 class="title">
+													{post.data.title}
+												</h4>
+
+												{data.categories && (
+													<div class="card-tags">
+														{data.categories.map(
+															(cat: string) => (
+																<span class="tag-badge">
+																	{cat}
+																</span>
+															),
+														)}
+													</div>
+												)}
+											</div>
+										</a>
+									</li>
+								);
+							})
 						}
 					</ul>
 

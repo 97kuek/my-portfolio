@@ -1,0 +1,144 @@
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { Resvg } from '@resvg/resvg-js';
+import satori from 'satori';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+// フォントの読み込み (publicフォルダから)
+const fontPath = join(process.cwd(), 'public', 'fonts', 'atkinson-bold.woff');
+const fontData = await readFile(fontPath);
+
+export async function getStaticPaths() {
+    const posts = await getCollection('blog');
+    return posts.map((post) => ({
+        params: { slug: post.id },
+        props: post,
+    }));
+}
+
+export async function GET({ props }: { props: CollectionEntry<'blog'> }) {
+    const { data } = props;
+
+    // SatoriでSVGを生成
+    const svg = await satori(
+        {
+            type: 'div',
+            props: {
+                style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(135deg, #1a1b26 0%, #24283b 100%)', // Dark theme background
+                    color: '#c0caf5',
+                    padding: '60px',
+                    justifyContent: 'center',
+                    fontFamily: 'Atkinson Hyperlegible'
+                },
+                children: [
+                    {
+                        type: 'div',
+                        props: {
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1,
+                                justifyContent: 'center',
+                            },
+                            children: [
+                                // Title
+                                {
+                                    type: 'div',
+                                    props: {
+                                        children: data.title,
+                                        style: {
+                                            fontSize: '64px',
+                                            fontWeight: 'bold',
+                                            color: '#fff',
+                                            marginBottom: '20px',
+                                            lineHeight: 1.2,
+                                            display: '-webkit-box',
+                                            webkitLineClamp: 3,
+                                            webkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                        }
+                                    }
+                                },
+                                // Metadata (Date & Site Name)
+                                {
+                                    type: 'div',
+                                    props: {
+                                        style: {
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            fontSize: '28px',
+                                            color: '#7aa2f7', // Accent color
+                                            marginTop: '40px',
+                                        },
+                                        children: [
+                                            {
+                                                type: 'span',
+                                                props: {
+                                                    children: data.pubDate.toLocaleDateString("ja-JP"),
+                                                    style: { marginRight: '20px' }
+                                                }
+                                            },
+                                            {
+                                                type: 'span',
+                                                props: {
+                                                    children: '|  @97kuek_ Blog',
+                                                    style: { opacity: 0.8 }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    // Footer / Decoration
+                    {
+                        type: 'div',
+                        props: {
+                            style: {
+                                position: 'absolute',
+                                bottom: '30px',
+                                right: '40px',
+                                fontSize: '24px',
+                                opacity: 0.5
+                            },
+                            children: 'Generated by Astro & Satori'
+                        }
+                    }
+                ],
+            },
+        },
+        {
+            width: 1200,
+            height: 630,
+            fonts: [
+                {
+                    name: 'Atkinson Hyperlegible',
+                    data: fontData,
+                    style: 'normal',
+                    weight: 700
+                },
+            ],
+        }
+    );
+
+    // SVG -> PNG変換
+    const resvg = new Resvg(svg, {
+        fitTo: {
+            mode: 'width',
+            value: 1200,
+        }
+    });
+    const png = resvg.render().asPng();
+
+    return new Response(png as any, {
+        headers: {
+            'Content-Type': 'image/png',
+        },
+    });
+}
