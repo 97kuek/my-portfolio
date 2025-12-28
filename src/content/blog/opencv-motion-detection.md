@@ -2,7 +2,7 @@
 title: OpenCVを用いた動体検知の方法
 description: 'PythonとOpenCVを使った背景差分法による動体検知の仕組みと実装手順を解説します。'
 pubDate: '2025-10-02'
-categories: ['Python']
+categories: ['Python', 'OpenCV']
 ---
 
 こんにちは！今回は、自動ドアや防犯カメラなど、身近なシステムで利用されている**動体検知**の仕組みを**初心者にもわかりやすく解説**していきたいと思います。

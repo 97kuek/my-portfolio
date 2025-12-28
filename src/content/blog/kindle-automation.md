@@ -2,7 +2,7 @@
 title: '【完全解説】PythonでKindleを全ページ自動スクショしてPDF化する技術のすべて'
 description: 'Kindleで買った技術書をPDFで検索したい…そんな悩みを解決する自作ツールの開発秘話。Python + Win32API + FastAPIで実現する、泥臭くも強力な自動化のロジックを徹底解説します。'
 pubDate: '2025-12-28'
-categories: ['Python']
+categories: ['Python', 'FastAPI', 'Automation']
 heroImage: '../../assets/kindle.png'
 ---
 

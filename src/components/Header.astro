@@ -17,7 +17,7 @@ import Search from "./Search.astro";
 				<HeaderLink href="/about">About</HeaderLink>
 			</div>
 			<div class="search-wrapper">
-				<Search />
+				<Search id="search-desktop" />
 			</div>
 			<div class="social-links">
 				<a href="https://x.com/97kuek_" target="_blank">
@@ -87,7 +87,7 @@ import Search from "./Search.astro";
 	<div id="mobile-menu" class="mobile-menu">
 		<div class="mobile-menu-content">
 			<div class="mobile-search">
-				<Search />
+				<Search id="search-mobile" />
 			</div>
 			<div class="mobile-links">
 				<HeaderLink href="/">Home</HeaderLink>
@@ -108,28 +108,59 @@ import Search from "./Search.astro";
 </header>
 
 <script>
-	const menuToggle = document.getElementById("menu-toggle");
-	const mobileMenu = document.getElementById("mobile-menu");
-	const overlay = document.getElementById("mobile-menu-overlay");
-	const bars = document.querySelectorAll(".bar");
+	function initMenu() {
+		const menuToggle = document.getElementById("menu-toggle");
+		const mobileMenu = document.getElementById("mobile-menu");
+		const overlay = document.getElementById("mobile-menu-overlay");
 
-	function toggleMenu() {
-		const isOpen = mobileMenu?.classList.contains("open");
-		if (isOpen) {
-			mobileMenu?.classList.remove("open");
-			overlay?.classList.remove("open");
-			menuToggle?.classList.remove("active");
-			document.body.style.overflow = "";
-		} else {
-			mobileMenu?.classList.add("open");
-			overlay?.classList.add("open");
-			menuToggle?.classList.add("active");
-			document.body.style.overflow = "hidden";
-		}
+		if (!menuToggle || !mobileMenu || !overlay) return;
+
+		// 既にイベントリスナーが登録されている可能性を考慮して、新しい関数を作成せずに
+		// クリーンアップするか、あるいはシンプルな実装にします。
+		// AstroのView Transitionsではページ遷移ごとにスクリプトが再実行される場合と
+		// イベントだけ発火する場合があります。
+
+		const toggleMenu = () => {
+			const isOpen = mobileMenu.classList.contains("open");
+			if (isOpen) {
+				mobileMenu.classList.remove("open");
+				overlay.classList.remove("open");
+				menuToggle.classList.remove("active");
+				document.body.style.overflow = "";
+			} else {
+				mobileMenu.classList.add("open");
+				overlay.classList.add("open");
+				menuToggle.classList.add("active");
+				document.body.style.overflow = "hidden";
+			}
+		};
+
+		// イベントリスナーの重複登録を防ぐためのクローン交換（簡易的な方法）
+		// または removeEventListener を正確に行う必要がありますが、
+		// ここでは要素取得ごとに新規設定する形をとります。
+
+		// Reset state on page load (important for back button navigation)
+		mobileMenu.classList.remove("open");
+		overlay.classList.remove("open");
+		menuToggle.classList.remove("active");
+		document.body.style.overflow = "";
+
+		menuToggle.onclick = toggleMenu;
+		overlay.onclick = toggleMenu;
+
+		// リンククリック時にメニューを閉じる
+		const links = mobileMenu.querySelectorAll("a");
+		links.forEach((link) => {
+			link.addEventListener("click", () => {
+				if (mobileMenu.classList.contains("open")) {
+					toggleMenu();
+				}
+			});
+		});
 	}
 
-	menuToggle?.addEventListener("click", toggleMenu);
-	overlay?.addEventListener("click", toggleMenu);
+	// View Transitionsに対応
+	document.addEventListener("astro:page-load", initMenu);
 </script>
 
 <style>

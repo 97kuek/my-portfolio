@@ -1,5 +1,5 @@
 ---
-title: 脱・初心者！Python中級者への道標
+title: Python中級者向け文法解説
 description: '単なるスクリプト記述から、堅牢で保守性の高いアプリケーション開発へ。Pythonの中級者向け文法、オブジェクト指向、モダンな機能を体系的に解説します。'
 pubDate: '2024-09-12'
 categories: ['Python']

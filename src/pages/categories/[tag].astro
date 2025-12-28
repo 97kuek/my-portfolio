@@ -1,13 +1,29 @@
 ---
-import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import defaultImage from "../../assets/blog-placeholder-new.png";
+import { getCollection, type CollectionEntry } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
-import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+import Header from "../../components/Header.astro";
+import TagCloud from "../../components/TagCloud.astro";
+import Search from "../../components/Search.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import { getReadingTime } from "../../utils/readingTime";
+
+interface BlogPostData {
+	title: string;
+	description: string;
+	pubDate: Date;
+	updatedDate?: Date;
+	heroImage?: ImageMetadata;
+	categories?: string[];
+	draft?: boolean;
+}
 
 export async function getStaticPaths() {
-	const allPosts = await getCollection("blog", ({ data }) => {
+	const allPosts = await getCollection("blog", (post) => {
+		const data = post.data as unknown as BlogPostData;
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 	const uniqueCategories = [
@@ -21,14 +37,34 @@ export async function getStaticPaths() {
 				(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 			);
 		return {
-			params: { category },
+			params: { tag: category },
 			props: { posts: filteredPosts },
 		};
 	});
 }
 
-const { category } = Astro.params;
+const { tag } = Astro.params;
+const category = tag;
 const { posts } = Astro.props;
+
+// For sidebar (archive) - reusing allPosts logic not efficient here but needed for archive count if we want it global.
+// For now, let's re-fetch global posts for sidebar consistency or just use the current filtered posts?
+// Usually sidebar archives/tags should reflect GLOBAL state, not filtered state.
+const globalPosts = await getCollection("blog", (post) => {
+	const data = post.data as unknown as BlogPostData;
+	return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const months = [
+	...new Set(
+		globalPosts.map((post) => {
+			const d = post.data.pubDate;
+			return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+		}),
+	),
+]
+	.sort()
+	.reverse();
 ---
 
 <!doctype html>
@@ -39,85 +75,289 @@ const { posts } = Astro.props;
 			description={SITE_DESCRIPTION}
 		/>
 		<style>
-			/* index.astro のスタイルを流用、または共通コンポーネント化するのが理想です */
 			main {
-				width: 720px;
+				width: 960px;
 				max-width: calc(100% - 2em);
 				margin: auto;
 				padding: 3em 1em;
 			}
-			h2 {
-				border-bottom: 2px solid var(--accent);
-				padding-bottom: 0.5rem;
-				margin-bottom: 2rem;
+
+			.container {
+				display: grid;
+				grid-template-columns: 1fr 240px;
+				gap: 3rem;
 			}
+
+			@media (max-width: 720px) {
+				.container {
+					grid-template-columns: 1fr;
+				}
+				aside {
+					order: -1;
+				}
+			}
+
 			ul {
-				list-style: none;
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
 				padding: 0;
 			}
-			li {
-				margin-bottom: 1.5rem;
-				display: flex;
-				gap: 1rem;
-				align-items: center;
-			}
-			img {
-				border-radius: 8px;
-				object-fit: cover;
-			}
-			.content h4 {
-				margin: 0;
-				font-size: 1.2rem;
-			}
-			.date {
-				font-size: 0.8rem;
-				color: #888;
-				margin: 0;
-			}
-			a {
-				text-decoration: none;
-				color: inherit;
-				display: flex;
-				gap: 1rem;
+
+			ul li {
 				width: 100%;
 			}
-			a:hover .title {
+
+			/* カード全体をリンクとして機能させる */
+			.card {
+				display: flex;
+				flex-direction: column;
+				text-decoration: none;
+				transition: all 0.2s ease-in-out;
+				height: 100%;
+				border-radius: 12px;
+				overflow: hidden;
+				background: var(--glass-bg);
+				border: 1px solid var(--glass-border);
+				color: inherit; /* テキストの色を継承 */
+			}
+
+			.card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+				border-color: var(--accent);
+			}
+
+			.card-image-wrapper {
+				width: 100%;
+				aspect-ratio: 16 / 9;
+				overflow: hidden;
+			}
+
+			.card img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transition: transform 0.3s ease;
+			}
+
+			.card:hover img {
+				transform: scale(1.05);
+			}
+
+			.content {
+				padding: 1.25rem;
+				display: flex;
+				flex-direction: column;
+				flex-grow: 1; /* コンテンツ部分を伸ばしてタグを下に固定 */
+			}
+
+			.title {
+				margin: 0.5rem 0;
+				color: rgb(var(--black));
+				font-size: 1.15rem;
+				line-height: 1.4;
+				font-weight: bold;
+			}
+
+			.card-meta {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.8rem;
+				margin-bottom: 0.2rem;
+				color: rgb(var(--gray));
+			}
+
+			.reading-time {
+				font-size: 0.8em;
+				opacity: 0.8;
+			}
+
+			.date {
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+				margin: 0;
+			}
+
+			/* カード内のタグ */
+			.card-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+				margin-top: auto; /* 下端に寄せる */
+				padding-top: 1rem;
+			}
+
+			.tag-badge {
+				font-size: 0.7rem;
+				background: rgba(
+					var(--gray-light),
+					0.8
+				); /* Darker/More opaque */
+				color: rgb(var(--gray-dark));
+				padding: 0.2rem 0.5rem;
+				border-radius: 4px;
+				border: 1px solid var(--glass-border);
+				white-space: nowrap;
+			}
+
+			/* サイドバー */
+			aside {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
+			.sidebar-section h3 {
+				font-size: 0.9rem;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				border-bottom: 2px solid var(--glass-border);
+				padding-bottom: 0.5rem;
+				margin-bottom: 1rem;
+				color: rgb(var(--gray));
+			}
+			.tag-list {
+				list-style: none;
+				padding: 0;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+			.archive-list {
+				list-style: none;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+			.sidebar-link {
+				font-size: 0.9rem;
+				text-decoration: none;
+				color: rgb(var(--gray-dark));
+				transition: color 0.2s;
+			}
+			.sidebar-link:hover {
 				color: var(--accent);
+			}
+			.tag.sidebar-link {
+				background: var(--glass-bg);
+				border: 1px solid var(--glass-border);
+				padding: 0.2rem 0.6rem;
+				border-radius: 100px;
+			}
+
+			/* Page Header for specific tag */
+			.page-header {
+				margin-bottom: 2rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid var(--glass-border);
+			}
+			.page-header h2 {
+				margin: 0;
+				font-size: 1.5rem;
 			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h2>カテゴリー: #{category} の記事一覧</h2>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<img
-											width={120}
-											height={80}
-											src={post.data.heroImage}
-											alt=""
-										/>
-									)}
-									<div class="content">
-										<p class="date">
-											<FormattedDate
-												date={post.data.pubDate}
-											/>
-										</p>
-										<h4 class="title">{post.data.title}</h4>
-									</div>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+			<div class="container">
+				<section>
+					<div class="page-header">
+						<h2>
+							Tech Stack: <span style="color: var(--accent);"
+								>#{category}</span>
+						</h2>
+					</div>
+
+					<ul>
+						{
+							posts.map((post) => {
+								const data =
+									post.data as unknown as BlogPostData;
+								return (
+									<li>
+										<a
+											href={`/blog/${post.id}/`}
+											class="card"
+										>
+											<div class="card-image-wrapper">
+												<Image
+													width={720}
+													height={360}
+													src={
+														data.heroImage ||
+														defaultImage
+													}
+													alt=""
+												/>
+											</div>
+											<div class="content">
+												<div class="card-meta">
+													<p class="date">
+														<FormattedDate
+															date={
+																post.data
+																	.pubDate
+															}
+														/>
+													</p>
+													<span class="reading-time">
+														•{" "}
+														{getReadingTime(
+															post.body ?? "",
+														)}
+													</span>
+												</div>
+												<h4 class="title">
+													{post.data.title}
+												</h4>
+
+												{data.categories && (
+													<div class="card-tags">
+														{data.categories.map(
+															(cat: string) => (
+																<span class="tag-badge">
+																	{cat}
+																</span>
+															),
+														)}
+													</div>
+												)}
+											</div>
+										</a>
+									</li>
+								);
+							})
+						}
+					</ul>
+				</section>
+
+				<aside>
+					<TagCloud />
+
+					<div class="sidebar-section">
+						<h3>Archive</h3>
+						<ul class="archive-list">
+							{
+								months.map((month) => (
+									<li>
+										<a
+											href={`/archive/${month}/`}
+											class="sidebar-link"
+										>
+											{month}
+										</a>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</aside>
+			</div>
 		</main>
 		<Footer />
 	</body>
