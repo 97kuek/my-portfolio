@@ -1,68 +1,75 @@
 ---
 import "@pagefind/default-ui/css/ui.css";
+
+interface Props {
+    type?: "modal" | "trigger";
+}
+
+const { type = "modal" } = Astro.props;
 ---
 
-<site-search>
-    <button
-        data-open-modal
-        disabled
-        aria-label="検索を開く"
-        title="検索を開く (Command+K)"
-    >
-        <svg
-            aria-hidden="true"
-            class="search-icon"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+{
+    type === "trigger" ? (
+        <button
+            data-open-modal-trigger
+            aria-label="検索を開く"
+            title="検索を開く (Command+K)"
+            class="search-trigger"
         >
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span class="sr-only">検索</span>
-    </button>
-
-    <dialog aria-label="記事を検索">
-        <div class="dialog-frame">
-            <div class="dialog-header">
-                <span class="dialog-title">検索</span>
-                <button
-                    data-close-modal
-                    class="close-button"
-                    aria-label="閉じる"
-                >
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <div class="search-container" id="search"></div>
-        </div>
-    </dialog>
-</site-search>
+            <svg
+                aria-hidden="true"
+                class="search-icon"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span class="sr-only">検索</span>
+        </button>
+    ) : (
+        <site-search>
+            <dialog aria-label="記事を検索">
+                <div class="dialog-frame">
+                    <div class="dialog-header">
+                        <span class="dialog-title">検索</span>
+                        <button
+                            data-close-modal
+                            class="close-button"
+                            aria-label="閉じる"
+                        >
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="search-container" id="search" />
+                </div>
+            </dialog>
+        </site-search>
+    )
+}
 
 <script>
+    // Define the logic only once or ensure it handles the modal mode
     class SiteSearch extends HTMLElement {
-        constructor() {
-            super();
-            const openBtn = this.querySelector<HTMLButtonElement>(
-                "button[data-open-modal]",
-            );
+        connectedCallback() {
             const closeBtn = this.querySelector<HTMLButtonElement>(
                 "button[data-close-modal]",
             );
@@ -70,23 +77,18 @@ import "@pagefind/default-ui/css/ui.css";
             const dialogFrame =
                 this.querySelector<HTMLDivElement>(".dialog-frame");
 
-            if (!openBtn || !closeBtn || !dialog || !dialogFrame) return;
+            if (!closeBtn || !dialog || !dialogFrame) return;
 
-            // 初期化完了時にボタンを有効化
-            openBtn.disabled = false;
-
-            // ダイアログを開く
             const onOpen = (event?: Event) => {
-                event?.preventDefault(); // リロードなどを防ぐ
+                event?.preventDefault();
+                if (dialog.open) return;
                 dialog.showModal();
-                // Pagefindの入力欄にフォーカス
                 const input = dialog.querySelector<HTMLInputElement>(
                     ".pagefind-ui__search-input",
                 );
                 if (input) {
                     input.focus();
                 } else {
-                    // まだ生成されていない場合のフォールバック（MutationObserverが確実だが簡易的に）
                     setTimeout(() => {
                         const input = dialog.querySelector<HTMLInputElement>(
                             ".pagefind-ui__search-input",
@@ -96,26 +98,11 @@ import "@pagefind/default-ui/css/ui.css";
                 }
             };
 
-            // ダイアログを閉じる
             const onClose = (event?: Event) => {
                 event?.preventDefault();
                 dialog.close();
             };
 
-            // フレーム外クリックで閉じる
-            const onBackdropClick = (event: MouseEvent) => {
-                const rect = dialog.getBoundingClientRect();
-                const isInDialog =
-                    rect.top <= event.clientY &&
-                    event.clientY <= rect.top + rect.height &&
-                    rect.left <= event.clientX &&
-                    event.clientX <= rect.left + rect.width;
-                if (!isInDialog) {
-                    dialog.close();
-                }
-            };
-
-            openBtn.addEventListener("click", onOpen);
             closeBtn.addEventListener("click", onClose);
             dialog.addEventListener("click", (e) => {
                 if (e.target === dialog) {
@@ -123,12 +110,19 @@ import "@pagefind/default-ui/css/ui.css";
                 }
             });
 
-            // キーボードショートカット (Command/Ctrl + K / /)
-            window.addEventListener("keydown", (e) => {
+            // Global Event Listener for Triggers
+            // We attach to window to catch events from any button
+            const handleOpenEvent = (e: CustomEvent) => onOpen(e);
+            window.addEventListener(
+                "open-search-modal",
+                handleOpenEvent as EventListener,
+            );
+
+            // Keyboard shortcuts
+            const handleKeydown = (e: KeyboardEvent) => {
                 if (e.key === "Escape" && dialog.open) {
-                    // dialogのデフォルト動作で閉じるが念のため
+                    // default logic usually works
                 }
-                // 検索を開く (Cmd+K or Ctrl+K or /)
                 const isCmdK = (e.metaKey || e.ctrlKey) && e.key === "k";
                 const isSlash =
                     e.key === "/" &&
@@ -137,59 +131,77 @@ import "@pagefind/default-ui/css/ui.css";
                     );
 
                 if ((isCmdK || isSlash) && !dialog.open) {
-                    e.preventDefault(); // "/"の入力をキャンセル
+                    e.preventDefault();
                     onOpen();
                 }
-            });
+            };
+            window.addEventListener("keydown", handleKeydown);
 
-            // Pagefindの初期化
-            // すでに初期化されている場合はスキップ、または再利用
-            // ここではdialogが開かれる前に初期化しておき、検索を即座に行えるようにする
-            // あるいは開くときにlazy loadするか。
-            // Astro View Transitionsを考慮して毎回初期化チェック
-            window.addEventListener("DOMContentLoaded", () => {
-                if (document.querySelector("#search .pagefind-ui")) return;
-                this.initPagefind();
-            });
-            // View Transitions用
-            document.addEventListener("astro:page-load", () => {
-                if (document.querySelector("#search .pagefind-ui")) return;
-                this.initPagefind();
-            });
+            // Initialize Pagefind
+            // Using ID 'search' is okay if there is only ONE modal in the DOM.
+            const initPagefind = async () => {
+                const searchDiv = this.querySelector("#search");
+                if (!searchDiv || searchDiv.innerHTML !== "") return;
 
-            // 初回実行
-            this.initPagefind();
-        }
+                const { PagefindUI } = await import("@pagefind/default-ui");
+                new PagefindUI({
+                    element: searchDiv,
+                    showSubResults: true,
+                    showImages: false,
+                    translations: {
+                        placeholder: "記事を検索...",
+                        clear_search: "クリア",
+                        zero_results: '"[SEARCH_TERM]" の検索結果はありません',
+                        many_results: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
+                        one_result: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
+                    },
+                });
+            };
 
-        async initPagefind() {
-            const searchDiv = this.querySelector("#search");
-            if (!searchDiv || searchDiv.innerHTML !== "") return;
-
-            const { PagefindUI } = await import("@pagefind/default-ui");
-            new PagefindUI({
-                element: searchDiv,
-                showSubResults: true,
-                showImages: false,
-                translations: {
-                    placeholder: "記事を検索...",
-                    clear_search: "クリア",
-                    zero_results: '"[SEARCH_TERM]" の検索結果はありません',
-                    many_results: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
-                    one_result: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
-                },
-            });
+            const loadHandler = () => initPagefind();
+            // Listen to both for robustness
+            window.addEventListener("DOMContentLoaded", loadHandler);
+            document.addEventListener("astro:page-load", loadHandler);
+            initPagefind();
         }
     }
 
-    customElements.define("site-search", SiteSearch);
+    if (!customElements.get("site-search")) {
+        customElements.define("site-search", SiteSearch);
+    }
+
+    // Trigger Logic (applied to buttons anywhere)
+    // We check if the script has already added the listener to avoid duplicates?
+    // But this script runs inside the component. If multiple components load, valid?
+    // But 'trigger' mode doesn't render the script block? No, Astro scripts are hoisted or scoped.
+    // If the script is inside the component, it runs when component is used.
+    // We should guard the global click listener.
+    if (!window._searchTriggerListenerAttached) {
+        document.addEventListener("click", (e) => {
+            const target = (e.target as HTMLElement).closest(
+                "button[data-open-modal-trigger]",
+            );
+            if (target) {
+                window.dispatchEvent(new CustomEvent("open-search-modal"));
+            }
+        });
+        window._searchTriggerListenerAttached = true;
+    }
+    // Add type definition to Window interface to avoid TS error?
+    // Typescript might complain but in Astro script tag it's loose or we can cast as any.
+    declare global {
+        interface Window {
+            _searchTriggerListenerAttached: boolean;
+        }
+    }
 </script>
 
 <style>
     site-search {
-        display: inline-block;
+        display: contents;
     }
 
-    button[data-open-modal] {
+    .search-trigger {
         background: transparent;
         border: none;
         color: rgb(var(--gray-dark));
@@ -204,14 +216,9 @@ import "@pagefind/default-ui/css/ui.css";
         justify-content: center;
     }
 
-    button[data-open-modal]:hover {
+    .search-trigger:hover {
         background-color: rgba(var(--accent), 0.1);
         color: var(--accent);
-    }
-
-    button[data-open-modal]:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
     }
 
     dialog {
@@ -223,11 +230,9 @@ import "@pagefind/default-ui/css/ui.css";
         height: 100vh;
         max-width: 100vw;
         max-height: 100vh;
-        background: transparent; /* backdrop handles background */
+        background: transparent;
         border: none;
         z-index: 1000;
-        /* display is handled by browser (none when closed, block when open). 
-		   We use flex for layout ONLY when open. */
         display: none;
         align-items: start;
         justify-content: center;
@@ -243,7 +248,6 @@ import "@pagefind/default-ui/css/ui.css";
         opacity: 1;
     }
 
-    /* Customize backdrop */
     dialog::backdrop {
         background: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(4px);
@@ -257,7 +261,7 @@ import "@pagefind/default-ui/css/ui.css";
     .dialog-frame {
         width: 90%;
         max-width: 600px;
-        background: #fff; /* ライトテーマ前提 */
+        background: #fff;
         border-radius: 12px;
         box-shadow:
             0 20px 25px -5px rgba(0, 0, 0, 0.1),
@@ -304,7 +308,7 @@ import "@pagefind/default-ui/css/ui.css";
         flex: 1;
     }
 
-    /* Pagefind UI Customization for this modal context */
+    /* Pagefind UI Customization */
     :global(.pagefind-ui__search-input) {
         background-color: transparent !important;
         border: 2px solid var(--accent) !important;
@@ -342,7 +346,7 @@ import "@pagefind/default-ui/css/ui.css";
     @media (max-width: 600px) {
         dialog {
             padding-top: 0;
-            align-items: flex-end; /* 下から出す、あるいはFullにする */
+            align-items: flex-end;
         }
         .dialog-frame {
             width: 100%;
