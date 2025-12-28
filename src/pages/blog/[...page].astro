@@ -1,31 +1,43 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import TagCloud from '../../components/TagCloud.astro';
-import Search from '../../components/Search.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { Image } from "astro:assets";
+import defaultImage from "../../assets/blog-placeholder-1.jpg";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Header from "../../components/Header.astro";
+import TagCloud from "../../components/TagCloud.astro";
+import Search from "../../components/Search.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import { getReadingTime } from "../../utils/readingTime";
 
 export async function getStaticPaths({ paginate }) {
-  const allPosts = await getCollection('blog', ({ data }) => {
-      return import.meta.env.PROD ? data.draft !== true : true;
-  });
-  const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-  return paginate(sortedPosts, { pageSize: 6 });
+	const allPosts = await getCollection("blog", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+	const sortedPosts = allPosts.sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	);
+	return paginate(sortedPosts, { pageSize: 6 });
 }
 
 const { page } = Astro.props;
-const allPosts = await getCollection('blog', ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+const allPosts = await getCollection("blog", ({ data }) => {
+	return import.meta.env.PROD ? data.draft !== true : true;
 }); // For sidebar (tags/archive)
-const tags = [...new Set(allPosts.map((post) => post.data.tags).flat())].filter(Boolean);
-const months = [...new Set(allPosts.map(post => {
-    const d = post.data.pubDate;
-    return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-}))].sort().reverse();
+const categories = [
+	...new Set(allPosts.map((post) => post.data.categories).flat()),
+].filter(Boolean);
+const months = [
+	...new Set(
+		allPosts.map((post) => {
+			const d = post.data.pubDate;
+			return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+		}),
+	),
+]
+	.sort()
+	.reverse();
 ---
 
 <!doctype html>
@@ -47,7 +59,9 @@ const months = [...new Set(allPosts.map(post => {
 			}
 
 			@media (max-width: 720px) {
-				.container { grid-template-columns: 1fr; }
+				.container {
+					grid-template-columns: 1fr;
+				}
 			}
 
 			ul {
@@ -58,9 +72,11 @@ const months = [...new Set(allPosts.map(post => {
 				margin: 0;
 				padding: 0;
 			}
-			
-			ul li { width: 100%; }
-			
+
+			ul li {
+				width: 100%;
+			}
+
 			/* カード全体をリンクとして機能させる */
 			.card {
 				display: flex;
@@ -77,7 +93,7 @@ const months = [...new Set(allPosts.map(post => {
 
 			.card:hover {
 				transform: translateY(-4px);
-				box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 				border-color: var(--accent);
 			}
 
@@ -113,6 +129,20 @@ const months = [...new Set(allPosts.map(post => {
 				font-weight: bold;
 			}
 
+			.card-meta {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.8rem;
+				margin-bottom: 0.2rem;
+				color: rgb(var(--gray));
+			}
+
+			.reading-time {
+				font-size: 0.8em;
+				opacity: 0.8;
+			}
+
 			.date {
 				font-size: 0.8rem;
 				color: rgb(var(--gray));
@@ -127,17 +157,26 @@ const months = [...new Set(allPosts.map(post => {
 				margin-top: auto; /* 下端に寄せる */
 				padding-top: 1rem;
 			}
-			
+
 			.tag-badge {
 				font-size: 0.7rem;
-				background: rgba(var(--gray-light), 0.5);
-				color: rgb(var(--gray));
+				background: rgba(
+					var(--gray-light),
+					0.8
+				); /* Darker/More opaque */
+				color: rgb(var(--gray-dark));
 				padding: 0.2rem 0.5rem;
 				border-radius: 4px;
+				border: 1px solid var(--glass-border);
+				white-space: nowrap;
 			}
 
 			/* サイドバー */
-			aside { display: flex; flex-direction: column; gap: 2rem; }
+			aside {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
 			.sidebar-section h3 {
 				font-size: 0.9rem;
 				text-transform: uppercase;
@@ -154,14 +193,22 @@ const months = [...new Set(allPosts.map(post => {
 				flex-wrap: wrap;
 				gap: 0.5rem;
 			}
-			.archive-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+			.archive-list {
+				list-style: none;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
 			.sidebar-link {
 				font-size: 0.9rem;
 				text-decoration: none;
 				color: rgb(var(--gray-dark));
 				transition: color 0.2s;
 			}
-			.sidebar-link:hover { color: var(--accent); }
+			.sidebar-link:hover {
+				color: var(--accent);
+			}
 			.tag.sidebar-link {
 				background: var(--glass-bg);
 				border: 1px solid var(--glass-border);
@@ -169,36 +216,35 @@ const months = [...new Set(allPosts.map(post => {
 				border-radius: 100px;
 			}
 
-            /* ページネーション */
-            .pagination {
-                display: flex;
-                justify-content: center;
-                gap: 1rem;
-                margin-top: 3rem;
-            }
-            .pagination a {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0.8rem 1.5rem;
-                border-radius: 50px;
-                background: var(--glass-bg);
-                border: 1px solid var(--glass-border);
-                color: rgb(var(--black));
-                text-decoration: none;
-                transition: all 0.2s;
-                font-weight: bold;
-            }
-            .pagination a:hover {
-                background: var(--accent);
-                color: #fff;
-                transform: translateY(-2px);
-            }
-            .pagination-disabled {
-                opacity: 0.5;
-                pointer-events: none;
-            }
-
+			/* ページネーション */
+			.pagination {
+				display: flex;
+				justify-content: center;
+				gap: 1rem;
+				margin-top: 3rem;
+			}
+			.pagination a {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.8rem 1.5rem;
+				border-radius: 50px;
+				background: var(--glass-bg);
+				border: 1px solid var(--glass-border);
+				color: rgb(var(--black));
+				text-decoration: none;
+				transition: all 0.2s;
+				font-weight: bold;
+			}
+			.pagination a:hover {
+				background: var(--accent);
+				color: #fff;
+				transform: translateY(-2px);
+			}
+			.pagination-disabled {
+				opacity: 0.5;
+				pointer-events: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -206,7 +252,7 @@ const months = [...new Set(allPosts.map(post => {
 		<main>
 			<div class="container">
 				<section>
-                    <Search />
+					<Search id="search-page" />
 					<ul>
 						{
 							page.data.map((post) => (
@@ -214,23 +260,43 @@ const months = [...new Set(allPosts.map(post => {
 									{/* URLを /blog/${post.slug}/ に変更してみる（Astroのバージョンによってidかslugか異なります） */}
 									<a href={`/blog/${post.id}/`} class="card">
 										<div class="card-image-wrapper">
-											{post.data.heroImage ? (
-												<Image width={720} height={360} src={post.data.heroImage} alt="" />
-											) : (
-												<div style="background: rgba(var(--gray-light), 0.5); width: 100%; height: 100%;"></div>
-											)}
+											<Image
+												width={720}
+												height={360}
+												src={
+													post.data.heroImage ||
+													defaultImage
+												}
+												alt=""
+											/>
 										</div>
 										<div class="content">
-											<p class="date">
-												<FormattedDate date={post.data.pubDate} />
-											</p>
-											<h4 class="title">{post.data.title}</h4>
-											
-											{post.data.tags && (
+											<div class="card-meta">
+												<p class="date">
+													<FormattedDate
+														date={post.data.pubDate}
+													/>
+												</p>
+												<span class="reading-time">
+													•{" "}
+													{getReadingTime(
+														post.body ?? "",
+													)}
+												</span>
+											</div>
+											<h4 class="title">
+												{post.data.title}
+											</h4>
+
+											{post.data.categories && (
 												<div class="card-tags">
-													{post.data.tags.map((tag) => (
-														<span class="tag-badge">#{tag}</span>
-													))}
+													{post.data.categories.map(
+														(cat: string) => (
+															<span class="tag-badge">
+																{cat}
+															</span>
+														),
+													)}
 												</div>
 											)}
 										</div>
@@ -240,29 +306,42 @@ const months = [...new Set(allPosts.map(post => {
 						}
 					</ul>
 
-                    <div class="pagination">
-                        {page.url.prev ? (
-                            <a href={page.url.prev}>&larr; Prev</a>
-                        ) : (
-                            <span />
-                        )}
-                        {page.url.next ? (
-                            <a href={page.url.next}>Next &rarr;</a>
-                        ) : (
-                            <span />
-                        )}
-                    </div>
+					<div class="pagination">
+						{
+							page.url.prev ? (
+								<a href={page.url.prev}>&larr; Prev</a>
+							) : (
+								<span />
+							)
+						}
+						{
+							page.url.next ? (
+								<a href={page.url.next}>Next &rarr;</a>
+							) : (
+								<span />
+							)
+						}
+					</div>
 				</section>
 
 				<aside>
 					<TagCloud />
-					
+
 					<div class="sidebar-section">
 						<h3>Archive</h3>
 						<ul class="archive-list">
-							{months.map(month => (
-								<li><a href={`/archive/${month}/`} class="sidebar-link">{month}</a></li>
-							))}
+							{
+								months.map((month) => (
+									<li>
+										<a
+											href={`/archive/${month}/`}
+											class="sidebar-link"
+										>
+											{month}
+										</a>
+									</li>
+								))
+							}
 						</ul>
 					</div>
 				</aside>

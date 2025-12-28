@@ -1,16 +1,18 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
-import profileImage from '../assets/profile.jpg';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import profileImage from "../assets/profile.jpg";
+import defaultImage from "../assets/blog-placeholder-1.jpg";
+import { getReadingTime } from "../utils/readingTime";
 
 // ブログ記事を取得し、新しい順に並べ替えて「最新の3件」だけ取り出す
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-).slice(0, 3);
+const posts = (await getCollection("blog"))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
 ---
 
 <!doctype html>
@@ -24,34 +26,35 @@ const posts = (await getCollection('blog')).sort(
 			<div class="hero-container">
 				<div class="hero-content">
 					<span class="greeting">Welcome to my portfolio.</span>
-					
+
 					<div class="typewriter-container">
 						<span class="fixed-text">I'm a </span>
 						<span id="typewriter-text" class="typing-text"></span>
 						<span class="cursor">|</span>
 					</div>
-					<p class="bio">
-						B2 Waseda FSE Comm.
-					</p>
+					<p class="bio">B2 Waseda FSE Comm.</p>
 					<p class="description">
-						人力飛行機・数値解析・ガジェットが好き。<br/>
+						人力飛行機・数値解析・ガジェットが好き。<br />
 						日々の学習記録や開発ログをまとめています。
 					</p>
-					
+
 					<div class="links">
 						<a href="/about" class="button primary">About me</a>
 					</div>
 				</div>
-				
-				<div class="hero-visual fade-in-up" style="animation-delay: 0.2s;">
+
+				<div
+					class="hero-visual fade-in-up"
+					style="animation-delay: 0.2s;"
+				>
 					<div class="image-wrapper animate-float">
 						<div class="profile-glow"></div>
-						<Image 
-							src={profileImage} 
-							alt="97kuek_" 
-							width={560} 
-							height={560} 
-							class="profile-img" 
+						<Image
+							src={profileImage}
+							alt="97kuek_"
+							width={560}
+							height={560}
+							class="profile-img"
 							loading="eager"
 						/>
 					</div>
@@ -65,23 +68,52 @@ const posts = (await getCollection('blog')).sort(
 					<h2>Latest Updates</h2>
 					<a href="/blog" class="view-all">すべて見る &rarr;</a>
 				</div>
-				
+
 				<div class="card-grid">
-					{posts.map((post, index) => (
-						<a href={`/blog/${post.id}/`} class="card glass-panel fade-in-up" style={`animation-delay: ${0.4 + index * 0.1}s;`}>
-							<div class="card-image">
-								{post.data.heroImage ? (
-									<Image src={post.data.heroImage} width={400} height={200} alt="" />
-								) : (
-									<div class="no-image">No Image</div>
-								)}
-							</div>
-							<div class="card-content">
-								<span class="date">{post.data.pubDate.toLocaleDateString('ja-JP')}</span>
-								<h3>{post.data.title}</h3>
-							</div>
-						</a>
-					))}
+					{
+						posts.map((post, index) => (
+							<a
+								href={`/blog/${post.id}/`}
+								class="card glass-panel fade-in-up"
+								style={`animation-delay: ${0.4 + index * 0.1}s;`}
+							>
+								<div class="card-image">
+									<Image
+										src={
+											post.data.heroImage || defaultImage
+										}
+										width={400}
+										height={200}
+										alt=""
+									/>
+								</div>
+								<div class="card-content">
+									<div class="card-meta">
+										<span class="date">
+											{post.data.pubDate.toLocaleDateString(
+												"ja-JP",
+											)}
+										</span>
+										<span class="reading-time">
+											• {getReadingTime(post.body ?? "")}
+										</span>
+									</div>
+									<h3>{post.data.title}</h3>
+									{post.data.categories && (
+										<div class="card-tags">
+											{post.data.categories
+												.slice(0, 3)
+												.map((cat: string) => (
+													<span class="tag">
+														{cat}
+													</span>
+												))}
+										</div>
+									)}
+								</div>
+							</a>
+						))
+					}
 				</div>
 			</section>
 		</main>
@@ -91,10 +123,10 @@ const posts = (await getCollection('blog')).sort(
 			const phrases = [
 				"birdman.",
 				"full-stack engineer.",
-				"MATLAB enthusiast."
+				"MATLAB enthusiast.",
 			];
-			
-			const textElement = document.getElementById('typewriter-text');
+
+			const textElement = document.getElementById("typewriter-text");
 			let phraseIndex = 0;
 			let charIndex = 0;
 			let isDeleting = false;
@@ -102,15 +134,23 @@ const posts = (await getCollection('blog')).sort(
 
 			function type() {
 				const currentPhrase = phrases[phraseIndex];
-				
-				if (isDeleting) {
-					textElement.textContent = currentPhrase.substring(0, charIndex - 1);
-					charIndex--;
-					typeSpeed = 50; // 消す速度
-				} else {
-					textElement.textContent = currentPhrase.substring(0, charIndex + 1);
-					charIndex++;
-					typeSpeed = 100; // 打つ速度
+
+				if (textElement) {
+					if (isDeleting) {
+						textElement.textContent = currentPhrase.substring(
+							0,
+							charIndex - 1,
+						);
+						charIndex--;
+						typeSpeed = 50; // 消す速度
+					} else {
+						textElement.textContent = currentPhrase.substring(
+							0,
+							charIndex + 1,
+						);
+						charIndex++;
+						typeSpeed = 100; // 打つ速度
+					}
 				}
 
 				if (!isDeleting && charIndex === currentPhrase.length) {
@@ -127,7 +167,7 @@ const posts = (await getCollection('blog')).sort(
 				setTimeout(type, typeSpeed);
 			}
 
-			document.addEventListener('DOMContentLoaded', type);
+			document.addEventListener("DOMContentLoaded", type);
 		</script>
 	</body>
 </html>
@@ -150,13 +190,13 @@ const posts = (await getCollection('blog')).sort(
 		padding: 4rem 2rem;
 		text-align: center;
 		background: #fff;
-        border: 1px solid rgba(0,0,0,0.05);
+		border: 1px solid rgba(0, 0, 0, 0.05);
 		border-radius: 24px;
 		margin-bottom: 4rem;
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
+		box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
 	}
-	
-	@media (min-width: 768px) {
+
+	@media (min-width: 900px) {
 		.hero-container {
 			flex-direction: row;
 			justify-content: space-between;
@@ -171,7 +211,7 @@ const posts = (await getCollection('blog')).sort(
 			display: flex;
 			justify-content: center;
 			align-items: center;
-            perspective: 1000px;
+			perspective: 1000px;
 		}
 	}
 
@@ -187,7 +227,7 @@ const posts = (await getCollection('blog')).sort(
 
 	/* ★タイピングアニメーションのスタイル */
 	.typewriter-container {
-		font-family: 'JetBrains Mono', monospace; /* Tech font */
+		font-family: "JetBrains Mono", monospace; /* Tech font */
 		font-size: 1.4rem;
 		font-weight: bold;
 		color: rgb(var(--gray));
@@ -205,8 +245,13 @@ const posts = (await getCollection('blog')).sort(
 		margin-left: 2px;
 	}
 	@keyframes blink {
-		from, to { opacity: 1; }
-		50% { opacity: 0; }
+		from,
+		to {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
 	}
 
 	h1 {
@@ -214,32 +259,32 @@ const posts = (await getCollection('blog')).sort(
 		line-height: 1.1;
 		margin: 0.2em 0 0.5em 0;
 		letter-spacing: -0.03em;
-        background: var(--primary-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+		background: var(--primary-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
 	}
 
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 2.5rem;
-        }
-        .hero-container {
-            padding: 3rem 1.5rem;
-        }
-    }
+	@media (max-width: 768px) {
+		h1 {
+			font-size: 2.5rem;
+		}
+		.hero-container {
+			padding: 3rem 1.5rem;
+		}
+	}
 
 	.bio {
 		font-size: 1.2rem;
 		font-weight: bold;
 		margin-bottom: 0.5em;
-        color: rgb(var(--gray-dark));
+		color: rgb(var(--gray-dark));
 	}
 	.description {
 		color: rgb(var(--gray));
 		line-height: 1.8;
 		margin-bottom: 2.5rem;
-        font-size: 1.05rem;
+		font-size: 1.05rem;
 	}
 
 	/* ボタン */
@@ -249,7 +294,9 @@ const posts = (await getCollection('blog')).sort(
 		justify-content: center;
 	}
 	@media (min-width: 768px) {
-		.links { justify-content: flex-start; }
+		.links {
+			justify-content: flex-start;
+		}
 	}
 
 	.button {
@@ -259,15 +306,15 @@ const posts = (await getCollection('blog')).sort(
 		font-weight: bold;
 		transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 		font-size: 1rem;
-        letter-spacing: 0.05em;
-        position: relative;
-        overflow: hidden;
+		letter-spacing: 0.05em;
+		position: relative;
+		overflow: hidden;
 	}
 	.primary {
 		background: var(--accent);
-		color: #fff; 
+		color: #fff;
 		box-shadow: 0 4px 15px rgba(35, 55, 255, 0.3);
-        border: 1px solid transparent;
+		border: 1px solid transparent;
 	}
 	.primary:hover {
 		background: var(--accent-dark);
@@ -275,30 +322,30 @@ const posts = (await getCollection('blog')).sort(
 		box-shadow: 0 8px 25px rgba(35, 55, 255, 0.4);
 	}
 
-    /* Visual */
+	/* Visual */
 	.image-wrapper {
 		position: relative;
-        transform-style: preserve-3d;
+		transform-style: preserve-3d;
 	}
-	
+
 	.profile-img {
 		width: 300px;
 		height: 300px;
-        max-width: 80vw;
-        max-height: 80vw;
+		max-width: 80vw;
+		max-height: 80vw;
 		object-fit: cover;
 		border-radius: 50%; /* 丸くする */
-		box-shadow: 0 20px 40px rgba(0,0,0,0.1); /* 影をつける */
-		border: 4px solid #fff; 
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); /* 影をつける */
+		border: 4px solid #fff;
 		position: relative;
 		z-index: 2;
-        transition: transform 0.5s;
+		transition: transform 0.5s;
 	}
-    
-    .profile-img:hover {
-        transform: scale(1.05) rotate(2deg);
-        border-color: var(--accent);
-    }
+
+	.profile-img:hover {
+		transform: scale(1.05) rotate(2deg);
+		border-color: var(--accent);
+	}
 
 	.profile-glow {
 		position: absolute;
@@ -307,24 +354,34 @@ const posts = (await getCollection('blog')).sort(
 		transform: translate(-50%, -50%);
 		width: 340px;
 		height: 340px;
-        max-width: 90vw;
-        max-height: 90vw;
-		background: radial-gradient(circle, rgba(35, 55, 255, 0.1) 0%, transparent 70%);
+		max-width: 90vw;
+		max-height: 90vw;
+		background: radial-gradient(
+			circle,
+			rgba(35, 55, 255, 0.1) 0%,
+			transparent 70%
+		);
 		border-radius: 50%;
 		z-index: 1;
-        animation: pulse-glow 4s infinite alternate;
+		animation: pulse-glow 4s infinite alternate;
 	}
-    
-    @keyframes pulse-glow {
-        0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
-        100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-    }
+
+	@keyframes pulse-glow {
+		0% {
+			opacity: 0.5;
+			transform: translate(-50%, -50%) scale(0.9);
+		}
+		100% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1.1);
+		}
+	}
 
 	.divider {
 		margin: 4rem 0;
 		border: 0;
 		border-top: 1px solid #eee;
-        opacity: 0.5;
+		opacity: 0.5;
 	}
 
 	/* --- 記事カードグリッド --- */
@@ -333,25 +390,39 @@ const posts = (await getCollection('blog')).sort(
 		justify-content: space-between;
 		align-items: baseline;
 		margin-bottom: 2.5rem;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 1rem;
+		border-bottom: 1px solid #eee;
+		padding-bottom: 1rem;
 	}
 	.view-all {
 		font-size: 0.95rem;
 		color: var(--accent);
 		text-decoration: none;
-        font-weight: bold;
-        transition: color 0.2s;
+		font-weight: bold;
+		transition: color 0.2s;
 	}
-    .view-all:hover {
-        color: var(--accent-dark);
-        text-decoration: underline;
-    }
-	
+	.view-all:hover {
+		color: var(--accent-dark);
+		text-decoration: underline;
+	}
+
 	.card-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		grid-template-columns: repeat(3, 1fr);
 		gap: 2.5rem;
+	}
+
+	@media (max-width: 900px) {
+		.card-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 2rem;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.card-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
 	}
 
 	.card {
@@ -360,40 +431,42 @@ const posts = (await getCollection('blog')).sort(
 		border-radius: 16px;
 		overflow: hidden;
 		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-		background: #fff; 
-		border: 1px solid rgba(0,0,0,0.05);
+		background: #fff;
+		border: 1px solid rgba(0, 0, 0, 0.05);
 		opacity: 0; /* for animation */
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 	}
 	.card:hover {
 		transform: translateY(-10px);
-		box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.01);
+		box-shadow:
+			0 20px 25px -5px rgba(0, 0, 0, 0.1),
+			0 8px 10px -6px rgba(0, 0, 0, 0.01);
 		border-color: rgba(35, 55, 255, 0.1);
 	}
-    
-    .card:hover .date {
-        color: var(--accent);
-    }
+
+	.card:hover .date {
+		color: var(--accent);
+	}
 
 	.card-image {
 		width: 100%;
 		height: 180px;
 		background: #f1f5f9;
 		overflow: hidden;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 	}
 	.card-image img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-        transition: transform 0.5s ease;
+		transition: transform 0.5s ease;
 	}
-    .card:hover .card-image img {
-        transform: scale(1.1);
-    }
-    
+	.card:hover .card-image img {
+		transform: scale(1.1);
+	}
+
 	.no-image {
 		height: 100%;
 		display: flex;
@@ -405,24 +478,52 @@ const posts = (await getCollection('blog')).sort(
 
 	.card-content {
 		padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between; /* Ensure vertical distribution */
 	}
 	.card-content h3 {
 		margin: 0.5rem 0 0;
 		font-size: 1.25rem;
 		line-height: 1.4;
-        color: rgb(var(--black));
-        transition: color 0.2s;
+		color: rgb(var(--black));
+		transition: color 0.2s;
 	}
-    .card:hover h3 {
-        color: var(--accent);
-    }
-	.date {
+	.card:hover h3 {
+		color: var(--accent);
+	}
+	.card-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		font-size: 0.85rem;
 		color: rgb(var(--gray));
-        font-family: 'JetBrains Mono', monospace;
-        transition: color 0.3s;
+		margin-bottom: 0.2rem;
+		font-family: "JetBrains Mono", monospace;
+	}
+
+	.reading-time {
+		font-size: 0.8em;
+		opacity: 0.8;
+	}
+
+	.card-tags {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: auto; /* Push to bottom if needed */
+		padding-top: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.tag {
+		background: rgba(var(--accent), 0.1); /* Increased visibility */
+		color: var(--accent);
+		padding: 0.2rem 0.6rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600; /* Bolder text */
+		border: 1px solid rgba(var(--accent), 0.2);
+		white-space: nowrap; /* Prevent breaking */
 	}
 </style>

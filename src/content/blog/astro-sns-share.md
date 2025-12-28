@@ -3,7 +3,7 @@ title: '静的サイトにSNSシェアボタンを導入する方法'
 description: '静的サイトにSNSシェアボタンを導入する方法を解説します。'
 pubDate: '2025-12-27'
 heroImage: '../../assets/astro.png'
-tags: ['Astro', 'Web開発', '技術解説']
+categories: ['Web Development']
 ---
 
 ## はじめに

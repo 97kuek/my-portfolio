@@ -2,7 +2,7 @@
 title: Pythonでダウンロードフォルダを秒で整理する自動化スクリプトを作る
 description: 'Pythonでダウンロードフォルダを秒で整理する自動化スクリプトを作る方法を解説します。'
 pubDate: '2025-04-11'
-tags: ['Python', '自動化', 'ダウンロードフォルダ整理']
+categories: ['Python']
 ---
 
 ## はじめに

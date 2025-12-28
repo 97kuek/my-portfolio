@@ -3,7 +3,7 @@ title: Giscussで静的サイトにコメント機能を実装しよう
 description: 'データベース不要！GitHub Discussionsを利用して、Astroなどの静的サイトに安全・無料でコメント欄を追加する方法を解説します。'
 pubDate: '2025-12-26'
 heroImage: '../../assets/giscuss.png'
-tags: ['Astro', 'Web開発', 'Giscuss', 'React']
+categories: ['Web Development']
 ---
 
 ## はじめに

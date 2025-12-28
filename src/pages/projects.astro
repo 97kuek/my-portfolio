@@ -1,0 +1,173 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { Image } from "astro:assets";
+
+// プロジェクト情報の型定義
+interface Project {
+    title: string;
+    description: string;
+    image?: string; // 修正: string型に変更 (publicフォルダのパスなど)
+    link: string;
+    tags: string[];
+}
+
+// プロジェクトデータ (将来的にContent Collectionsに移行可能)
+const projects: Project[] = [
+    {
+        title: "Kindle to PDF Converter",
+        description:
+            "Kindleの全ページを自動でスクリーンショット撮影し、PDF化するWindowsデスクトップアプリ。Python,Win32API,FastAPIを使用。",
+        // image: "../../assets/kindle.png", // 仮のパス
+        link: "/blog/kindle-automation", // 関連ブログ記事へのリンク
+        tags: ["Python", "Automation", "Desktop App"],
+    },
+    {
+        title: "Portfolio Site",
+        description:
+            "このポートフォリオサイト自体です。Astroを使用し、高速でSEOに優れた静的サイトとして構築しました。",
+        // image: "../../assets/astro.png",
+        link: "/blog/why-astro",
+        tags: ["Astro", "TypeScript", "Web"],
+    },
+    {
+        title: "Download Folder Organizer",
+        description:
+            "乱雑になりがちなダウンロードフォルダを、拡張子ごとに自動で振り分けるPythonスクリプト。",
+        link: "/blog/python-download-organizer",
+        tags: ["Python", "Automation"],
+    },
+    {
+        title: "Discord Bot",
+        description:
+            "Node.jsを使用した自分専用のDiscordボット。サーバー管理や便利機能を搭載。",
+        link: "/blog/nodejs-discord-bot",
+        tags: ["Node.js", "Discord"],
+    },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+    <head>
+        <BaseHead
+            title={`Projects | ${SITE_TITLE}`}
+            description={SITE_DESCRIPTION}
+        />
+        <style>
+            main {
+                width: 960px;
+                max-width: calc(100% - 2em);
+                margin: 0 auto;
+                padding: 3em 1em;
+            }
+            h1 {
+                margin-bottom: 2rem;
+                text-align: center;
+                font-size: 2.5rem;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .project-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+            .project-card {
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                overflow: hidden;
+                transition:
+                    transform 0.2s,
+                    box-shadow 0.2s;
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+            .project-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+                border-color: var(--accent);
+            }
+            .project-image {
+                width: 100%;
+                height: 200px;
+                background: #f1f5f9; /* Placeholder color */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #888;
+                font-size: 0.9rem;
+            }
+            .project-content {
+                padding: 1.5rem;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+            .project-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+                margin: 0 0 0.5rem 0;
+                color: rgb(var(--black));
+            }
+            .project-desc {
+                font-size: 0.95rem;
+                color: rgb(var(--gray));
+                line-height: 1.5;
+                margin-bottom: 1rem;
+                flex-grow: 1;
+            }
+            .project-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: auto;
+            }
+            .tag {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.6rem;
+                background: rgba(var(--accent), 0.1);
+                color: var(--accent);
+                border-radius: 4px;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <main>
+            <h1>Projects</h1>
+            <div class="project-grid">
+                {
+                    projects.map((project) => (
+                        <a href={project.link} class="project-card">
+                            <div class="project-image">
+                                {/* placeholder for now, ideally verified images */}
+                                {project.title}
+                            </div>
+                            <div class="project-content">
+                                <h3 class="project-title">{project.title}</h3>
+                                <p class="project-desc">
+                                    {project.description}
+                                </p>
+                                <div class="project-tags">
+                                    {project.tags.map((tag) => (
+                                        <span class="tag">{tag}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        </a>
+                    ))
+                }
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>

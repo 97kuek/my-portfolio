@@ -1,28 +1,31 @@
 ---
-import '@pagefind/default-ui/css/ui.css';
+import "@pagefind/default-ui/css/ui.css";
+
+const { id = "search" } = Astro.props;
 ---
 
-<div id="search" class="search-container"></div>
+<div id={id} class="search-container"></div>
 
-<script>
-    import { PagefindUI } from '@pagefind/default-ui';
+<script define:vars={{ id }}>
+    import { PagefindUI } from "@pagefind/default-ui";
 
     // View Transitions対応: ページ遷移ごとに再初期化
-    document.addEventListener('astro:page-load', () => {
-        const searchContainer = document.querySelector('#search');
+    document.addEventListener("astro:page-load", () => {
+        const selector = `#${id}`;
+        const searchContainer = document.querySelector(selector);
         if (searchContainer) {
-            searchContainer.innerHTML = ''; // クリアして再生成
+            searchContainer.innerHTML = ""; // クリアして再生成
             new PagefindUI({
-                element: '#search',
+                element: selector,
                 showSubResults: true,
                 showImages: false,
                 translations: {
-                    placeholder: '記事を検索...',
-                    clear_search: 'クリア',
+                    placeholder: "記事を検索...",
+                    clear_search: "クリア",
                     zero_results: '"[SEARCH_TERM]" の検索結果はありません',
                     many_results: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
                     one_result: '"[SEARCH_TERM]" の検索結果: [COUNT] 件',
-                }
+                },
             });
         }
     });
@@ -33,34 +36,53 @@ import '@pagefind/default-ui/css/ui.css';
         --pagefind-ui-scale: 0.8;
         --pagefind-ui-primary: var(--accent);
         --pagefind-ui-text: rgb(var(--gray-dark));
-        --pagefind-ui-background: var(--glass-bg);
-        --pagefind-ui-border: var(--glass-border);
-        --pagefind-ui-tag: rgba(var(--gray-light), 0.5);
+        --pagefind-ui-background: #ffffff;
+        --pagefind-ui-border: rgba(0, 0, 0, 0.1);
+        --pagefind-ui-tag: #f3f4f6;
         --pagefind-ui-border-width: 1px;
         --pagefind-ui-border-radius: 8px;
-        --pagefind-ui-font: 'Outfit', sans-serif;
+        --pagefind-ui-font: "Outfit", sans-serif;
     }
 
     /* Pagefindのデフォルトスタイルを微調整 */
     :global(.pagefind-ui__search-input) {
-        background-color: var(--glass-bg) !important;
-        border: 1px solid var(--glass-border) !important;
+        background-color: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
         color: rgb(var(--black)) !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-radius: 12px !important;
+        padding: 1.2rem 1rem !important;
+        font-size: 1rem !important;
     }
+
+    :global(.pagefind-ui__search-input:focus) {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 2px rgba(var(--accent), 0.1) !important;
+        outline: none;
+    }
+
     :global(.pagefind-ui__drawer) {
-        background-color: var(--glass-bg) !important;
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        border-radius: 12px;
+        box-shadow:
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
     :global(.pagefind-ui__result) {
-        border-bottom: 1px solid var(--glass-border) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        padding: 1rem !important;
+    }
+    :global(.pagefind-ui__result:hover) {
+        background-color: rgba(var(--accent), 0.02);
     }
     :global(.pagefind-ui__result-title) {
         color: var(--accent) !important;
+        font-weight: bold;
     }
     :global(.pagefind-ui__result-excerpt) {
         color: rgb(var(--gray)) !important;
+        font-size: 0.9em !important;
     }
 </style>

@@ -3,7 +3,7 @@ title: 'Astroのコードブロックを劇的に見やすくする！Expressive
 description: 'Astroのコードブロックを劇的に見やすくする！Expressive Code導入ガイド'
 pubDate: '2025-12-27'
 heroImage: '../../assets/astro.png'
-tags: ['Astro', 'Web開発', '技術解説']
+categories: ['Web Development']
 ---
 
 ## はじめに

@@ -1,0 +1,106 @@
+---
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("blog");
+const allCategories = posts.flatMap((p) => p.data.categories || []);
+
+// Compare with raw glob import to bypass Content Collection schema
+const rawPosts = await Astro.glob("../content/blog/*.md");
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Debug Categories</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 2rem;
+                background: #eee;
+            }
+            pre {
+                background: #fff;
+                padding: 1rem;
+                border-radius: 8px;
+                overflow: auto;
+            }
+            .success {
+                color: green;
+                font-weight: bold;
+            }
+            .error {
+                color: red;
+                font-weight: bold;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Debug Categories Info (v2)</h1>
+
+        <h2>Summary</h2>
+        <p>
+            Collection Posts: <strong>{posts.length}</strong> (Categories: {
+                allCategories.length
+            })
+        </p>
+        <p>
+            Glob Posts: <strong>{rawPosts.length}</strong> (Should be same as posts)
+        </p>
+
+        <div class="grid">
+            <div>
+                <h2>Collection Data (Schema Filtered)</h2>
+                {
+                    posts.map((post) => (
+                        <div style="margin-bottom: 2rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+                            <h3>{post.id}</h3>
+                            <p>Title: {post.data.title}</p>
+                            <p>
+                                Categories type: {typeof post.data.categories}
+                            </p>
+                            <p>
+                                Categories:{" "}
+                                {JSON.stringify(post.data.categories)}
+                            </p>
+                            <details>
+                                <summary>Full Data</summary>
+                                <pre>{JSON.stringify(post.data, null, 2)}</pre>
+                            </details>
+                        </div>
+                    ))
+                }
+            </div>
+            <div>
+                <h2>Raw Glob Data (Direct File Read)</h2>
+                {
+                    rawPosts.map((post) => (
+                        <div style="margin-bottom: 2rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+                            <h3>{post.file.split("/").pop()}</h3>
+                            <p>Title: {post.frontmatter.title}</p>
+                            <p>
+                                Categories type:{" "}
+                                {typeof post.frontmatter.categories}
+                            </p>
+                            <p>
+                                Categories:{" "}
+                                {JSON.stringify(post.frontmatter.categories)}
+                            </p>
+                            <details>
+                                <summary>Full Frontmatter</summary>
+                                <pre>
+                                    {JSON.stringify(post.frontmatter, null, 2)}
+                                </pre>
+                            </details>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </body>
+</html>

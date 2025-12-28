@@ -3,7 +3,7 @@ title: '僕がポートフォリオサイトにAstroを選んだ理由'
 description: '新世代の静的サイトジェネレーター「Astro」の特徴とセットアップ方法、そして僕が選んだ理由を解説します！'
 pubDate: '2025-12-02'
 heroImage: '../../assets/astro.png'
-tags: ['Astro', 'Web開発', '技術解説']
+categories: ['Web Development']
 ---
 
 今まではnoteでブログを書いていたんですが、情報系学生というのもあり、Webのことを学ぶためにもポートフォリオを作ろうと思いました。

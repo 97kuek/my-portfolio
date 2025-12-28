@@ -1,51 +1,57 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
-const allPosts = await getCollection('blog', ({ data }) => {
+const allPosts = await getCollection("blog", ({ data }) => {
     return import.meta.env.PROD ? data.draft !== true : true;
 });
-const tags = allPosts
-    .flatMap((post) => post.data.tags || [])
-    .filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
+const categories = allPosts
+    .flatMap((post) => post.data.categories || [])
+    .filter((cat) => typeof cat === "string" && cat.trim().length > 0);
 
-const tagCounts = tags.reduce((acc, tag) => {
-    acc[tag] = (acc[tag] || 0) + 1;
-    return acc;
-}, {} as Record<string, number>);
+const categoryCounts = categories.reduce(
+    (acc, cat) => {
+        acc[cat] = (acc[cat] || 0) + 1;
+        return acc;
+    },
+    {} as Record<string, number>,
+);
 
-const uniqueTags = Object.keys(tagCounts).sort();
+const uniqueCategories = Object.keys(categoryCounts).sort();
 
 // フォントサイズの計算用
-const maxCount = Math.max(...Object.values(tagCounts));
-const minCount = Math.min(...Object.values(tagCounts));
+const maxCount = Math.max(...Object.values(categoryCounts));
+const minCount = Math.min(...Object.values(categoryCounts));
 
 const getFontSize = (count: number) => {
-    if (maxCount === minCount) return '1rem';
+    if (maxCount === minCount) return "1rem";
     // 0.8rem ～ 1.5rem の範囲でサイズを調整
     const size = 0.8 + ((count - minCount) / (maxCount - minCount)) * 0.7;
     return `${size.toFixed(2)}rem`;
 };
 
 const getOpacity = (count: number) => {
-     if (maxCount === minCount) return 1;
-     // 頻度が高いほど濃く (0.7 ~ 1.0)
-     return 0.7 + ((count - minCount) / (maxCount - minCount)) * 0.3;
-}
+    if (maxCount === minCount) return 1;
+    // 頻度が高いほど濃く (0.7 ~ 1.0)
+    return 0.7 + ((count - minCount) / (maxCount - minCount)) * 0.3;
+};
 ---
 
 <div class="tag-cloud glass-panel">
-    <h3>Tags</h3>
+    <h3>Categories</h3>
     <div class="tags">
-        {uniqueTags.map((tag) => (
-            <a 
-                href={`/tags/${tag}/`} 
-                class="tag-link"
-                style={`font-size: ${getFontSize(tagCounts[tag])}; opacity: ${getOpacity(tagCounts[tag])};`}
-            >
-                <span class="hash">#</span>{tag}
-                <span class="count">({tagCounts[tag]})</span>
-            </a>
-        ))}
+        {
+            uniqueCategories.map((cat) => (
+                <a
+                    href={`/categories/${cat}/`}
+                    class="tag-link"
+                    style={`font-size: ${getFontSize(categoryCounts[cat])}; opacity: ${getOpacity(categoryCounts[cat])};`}
+                >
+                    <span class="hash">#</span>
+                    {cat}
+                    <span class="count">({categoryCounts[cat]})</span>
+                </a>
+            ))
+        }
     </div>
 </div>
 
