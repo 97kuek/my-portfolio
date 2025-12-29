@@ -11,22 +11,26 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 import expressiveCode from 'astro-expressive-code';
+import mermaid from 'astro-mermaid';
 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://97kuek.vercel.app',
 
     // ▼▼▼ ここを修正しました（expressiveCodeを先頭に移動） ▼▼▼
-    integrations: [expressiveCode({
-        themes: ['github-dark'],
-        frames: {
-            showCopyToClipboardButton: true,
-        },
-    }), mdx(), sitemap(), partytown({
-        config: {
-            forward: ["dataLayer.push"],
-        },
-    })],
+    integrations: [
+        mermaid(),
+        expressiveCode({
+            themes: ['github-dark'],
+            frames: {
+                showCopyToClipboardButton: true,
+            },
+        }), mdx(), sitemap(), partytown({
+            config: {
+                forward: ["dataLayer.push"],
+            },
+        })
+    ],
 
     // 2. 追加: ここで数式プラグインとTOC用プラグインを有効化します
     markdown: {
