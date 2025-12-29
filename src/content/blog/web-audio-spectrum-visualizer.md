@@ -2,7 +2,7 @@
 title: Web Audio APIで最強のスペクトラム・アナライザを作る（基本から応用まで）
 description: 'Web Audio APIとCanvasを使って、プロ仕様のオーディオビジュアライザーを一から実装する方法を解説します。対数スケール表示、ウォーターフォール（スペクトログラム）、チューナー機能の実装まで詳解。'
 pubDate: '2025-12-29'
-heroImage: '../../assets/web-audio-visualizer.jpg'
+heroImage: '../../assets/audio.png'
 categories: ['JavaScript', 'Web Audio API', 'Canvas']
 ---
 
