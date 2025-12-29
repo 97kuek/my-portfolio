@@ -175,30 +175,49 @@ const months = [
 			.pagination {
 				display: flex;
 				justify-content: center;
-				gap: 1rem;
+				align-items: center;
+				gap: 0.5rem;
 				margin-top: 3rem;
+				flex-wrap: wrap;
 			}
-			.pagination a {
+			.pagination a,
+			.pagination span {
 				display: inline-flex;
 				align-items: center;
 				justify-content: center;
-				padding: 0.8rem 1.5rem;
-				border-radius: 50px;
+				height: 40px;
+				min-width: 40px;
+				padding: 0 0.5rem;
+				border-radius: 8px; /* 四角に近い丸み */
 				background: var(--glass-bg);
 				border: 1px solid var(--glass-border);
 				color: rgb(var(--black));
 				text-decoration: none;
 				transition: all 0.2s;
 				font-weight: bold;
+				font-size: 0.9rem;
 			}
 			.pagination a:hover {
 				background: var(--accent);
 				color: #fff;
 				transform: translateY(-2px);
+				border-color: var(--accent);
 			}
-			.pagination-disabled {
-				opacity: 0.5;
+			.pagination .active {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent);
 				pointer-events: none;
+			}
+			.pagination .prev-next {
+				padding: 0 1rem;
+				border-radius: 20px; /* 前後は丸く */
+			}
+			.pagination .disabled {
+				opacity: 0.4;
+				pointer-events: none;
+				background: transparent;
+				border: 1px solid transparent;
 			}
 		</style>
 	</head>
@@ -222,16 +241,50 @@ const months = [
 					<div class="pagination">
 						{
 							page.url.prev ? (
-								<a href={page.url.prev}>&larr; Prev</a>
+								<a href={page.url.prev} class="prev-next">
+									&larr; Prev
+								</a>
 							) : (
-								<span />
+								<span class="prev-next disabled">
+									&larr; Prev
+								</span>
 							)
 						}
+
+						{
+							[...Array(page.lastPage).keys()].map((i) => {
+								const pageNum = i + 1;
+								// Determine if this is the current page
+								const isCurrent = pageNum === page.currentPage;
+								// Build the URL for this page number
+								const href =
+									pageNum === 1
+										? "/blog"
+										: `/blog/${pageNum}`;
+
+								return (
+									<a
+										href={href}
+										class:list={[
+											"page-num",
+											{ active: isCurrent },
+										]}
+									>
+										{pageNum}
+									</a>
+								);
+							})
+						}
+
 						{
 							page.url.next ? (
-								<a href={page.url.next}>Next &rarr;</a>
+								<a href={page.url.next} class="prev-next">
+									Next &rarr;
+								</a>
 							) : (
-								<span />
+								<span class="prev-next disabled">
+									Next &rarr;
+								</span>
 							)
 						}
 					</div>
