@@ -176,7 +176,42 @@ $$
 
 ---
 
-## 5. まとめ
+## 5. アルゴリズムの実行フロー（全体像）
+
+最後に、FFTアルゴリズムが具体的にどのような手順で実行されるのかを可視化します。
+データがどのように変形され、最終的なスペクトルに至るのかを確認してください。
+
+```mermaid
+graph TD
+    subgraph Input [Step 1: Input & Sorting]
+        A[入力データ x] -->|ビットリバース| B[並べ替え済みデータ]
+    end
+    subgraph Calc [Step 2: Butterfly Stages]
+        B --> C[ステージ1<br>サイズ2のDFT]
+        C --> D[ステージ2<br>サイズ4のDFT]
+        D -->|...| E[ステージlogN<br>サイズNのDFT]
+    end
+    subgraph Output [Step 3: Output]
+        E --> F[周波数スペクトル X]
+    end
+
+    style Input fill:#f9f,stroke:#333,stroke-width:2px
+    style Calc fill:#bbf,stroke:#333,stroke-width:2px
+    style Output fill:#aff,stroke:#333,stroke-width:2px
+```
+
+### 各ステップの詳細
+
+1.  **Bit Reversal Sorting**:
+    データをメモリ上で「飛び飛び」にアクセスしなくて済むよう、最初に並べ替えます。
+2.  **Butterfly Loop**:
+    $\log_2 N$ 回のステージを繰り返します。ステージが進むごとに、計算対象のブロックサイズが $2, 4, 8, \dots, N$ と倍になっていきます。
+3.  **Output**:
+    最終的な配列には、周波数順 ($0 \sim N-1$) に成分の値が格納されます。
+
+---
+
+## 6. まとめ
 
 FFTは、単なる高速化テクニックではありません。「分割統治」「対称性の利用」「ビット操作」といった、アルゴリズム設計のエッセンスが凝縮された芸術作品です。
 

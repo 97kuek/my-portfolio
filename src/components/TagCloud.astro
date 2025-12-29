@@ -50,26 +50,46 @@ const newMaxCount =
     sortedTags.length > 0 ? Math.max(...sortedTags.map((tag) => tag.count)) : 1;
 ---
 
-<div class="tag-cloud glass-panel">
-    <h3>Tech Stack & Categories</h3>
-    <div class="tags-grid">
-        {
-            sortedTags.map((tag) => (
-                <a href={`/categories/${tag.name}/`} class="tag-card">
-                    <div class="icon-box">
-                        <TechIcon name={tag.name} />
-                    </div>
-                    <span class="tag-name">{tag.name}</span>
-                    {showCount && <span class="tag-count">{tag.count}</span>}
-                </a>
-            ))
-        }
+<div class="tag-cloud glass-panel" id="tech-stack-container">
+    <h3 id="tech-stack-header" class="clickable-header">
+        Tech Stack & Categories
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="chevron-icon"
+        >
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </h3>
+    <div class="tag-cloud-content-wrapper" id="tech-stack-content">
+        <div class="tags-grid">
+            {
+                sortedTags.map((tag) => (
+                    <a href={`/categories/${tag.name}/`} class="tag-card">
+                        <div class="icon-box">
+                            <TechIcon name={tag.name} />
+                        </div>
+                        <span class="tag-name">{tag.name}</span>
+                        {showCount && (
+                            <span class="tag-count">{tag.count}</span>
+                        )}
+                    </a>
+                ))
+            }
+        </div>
     </div>
 </div>
 
 <style>
     .tag-cloud {
-        padding: 2rem;
+        padding: 1.5rem 2rem;
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.9);
@@ -78,6 +98,7 @@ const newMaxCount =
             inset 0 0 20px rgba(255, 255, 255, 0.8);
         overflow: hidden;
         position: relative;
+        transition: all 0.3s ease;
     }
 
     /* Decoration background */
@@ -99,27 +120,48 @@ const newMaxCount =
     }
 
     .tag-cloud h3 {
-        margin: 0 0 1.5rem 0;
+        margin: 0;
         font-size: 1.2rem;
         color: rgb(var(--black));
         font-weight: 800;
         letter-spacing: 0.05em;
         position: relative;
-        z-index: 1;
+        z-index: 2;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
     }
 
-    .tag-cloud h3::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: linear-gradient(
-            90deg,
-            rgba(var(--black), 0.1) 0%,
-            transparent 100%
-        );
+    /* Chevron icon rotation */
+    .chevron-icon {
+        transition: transform 0.3s ease;
+        color: rgba(var(--gray), 0.8);
+    }
+
+    .tag-cloud.collapsed .chevron-icon {
+        transform: rotate(-90deg);
+    }
+
+    .tag-cloud h3:hover .chevron-icon {
+        color: var(--accent);
+    }
+
+    /* Content wrapper for smooth height transition */
+    .tag-cloud-content-wrapper {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition:
+            grid-template-rows 0.3s ease-out,
+            margin-top 0.3s ease;
+        margin-top: 1.5rem;
+    }
+
+    .tag-cloud.collapsed .tag-cloud-content-wrapper {
+        grid-template-rows: 0fr;
+        margin-top: 0;
     }
 
     .tags-grid {
@@ -128,6 +170,8 @@ const newMaxCount =
         gap: 0.8rem;
         position: relative;
         z-index: 1;
+        overflow: hidden; /* Important for grid-template-rows animation */
+        min-height: 0; /* Important for grid-template-rows animation */
     }
 
     .tag-card {
@@ -209,3 +253,29 @@ const newMaxCount =
         color: #fff;
     }
 </style>
+
+<script>
+    // Toggle functionality for the tech stack section
+    function initTechStackToggle() {
+        // Use a more specific selector or process all instances
+        const containers = document.querySelectorAll(".tag-cloud");
+
+        containers.forEach((container) => {
+            const header = container.querySelector("h3");
+            if (header) {
+                // Remove existing listeners to be safe with View Transitions
+                const newHeader = header.cloneNode(true);
+                header.parentNode?.replaceChild(newHeader, header);
+
+                newHeader.addEventListener("click", () => {
+                    container.classList.toggle("collapsed");
+                });
+            }
+        });
+    }
+
+    // Initialize on page load and after Astro view transitions
+    document.addEventListener("astro:page-load", initTechStackToggle);
+    // Also run immediately in case of simple load
+    initTechStackToggle();
+</script>
