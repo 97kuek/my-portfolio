@@ -1,7 +1,7 @@
 ---
 title: '高速フーリエ変換(FFT)とは？'
 description: 'FFTの解説'
-pubDate: '2025-12-29'
+pubDate: '2025-09-29'
 heroImage: '../../assets/fft.png'
 categories: ['数学', 'アルゴリズムとデータ構造']
 ---
