@@ -28,7 +28,7 @@ categories: ['JavaScript', 'WebRTC', 'P2P', 'Vanilla JS', 'FastAPI']
 
 https://github.com/97kuek/WebDrop
 
-![WebDrop画面1](../../assets/WebDrop.png)
+![WebDrop画面1](../../assets/WebDrop_2.png)
 *起動画面、QRコードでスマホ側のブラウザを起動することができる*
 ![WebDrop画面2](../../assets/WebDrop_2.png)
 *スマホ側のブラウザで起動した画面*
@@ -233,7 +233,7 @@ async function sendFile(file) {
 WebDropは、使い心地（UX）にもこだわっています。
 デザインコンセプトは **"Glassmorphism"（すりガラス）** です。
 
-![Glassmorphism UI](../../assets/webdrop.png)
+![Glassmorphism UI](../../assets/WebDrop_2.png)
 
 ### CSS Variablesによるテーマ管理
 
