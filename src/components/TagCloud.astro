@@ -51,17 +51,16 @@ const newMaxCount =
 ---
 
 <div class="tag-cloud glass-panel">
-    <h3>Tech Stack</h3>
-    <div class="tags">
+    <h3>Tech Stack & Categories</h3>
+    <div class="tags-grid">
         {
             sortedTags.map((tag) => (
-                <a
-                    href={`/categories/${tag.name}/`}
-                    class="tag"
-                    style={`font-size: ${1 + (tag.count / newMaxCount) * 0.5}rem; opacity: ${0.8 + (tag.count / newMaxCount) * 0.2}`}
-                >
-                    <TechIcon name={tag.name} />
-                    {tag.name} {showCount && `(${tag.count})`}
+                <a href={`/categories/${tag.name}/`} class="tag-card">
+                    <div class="icon-box">
+                        <TechIcon name={tag.name} />
+                    </div>
+                    <span class="tag-name">{tag.name}</span>
+                    {showCount && <span class="tag-count">{tag.count}</span>}
                 </a>
             ))
         }
@@ -70,42 +69,143 @@ const newMaxCount =
 
 <style>
     .tag-cloud {
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
+        padding: 2rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.05),
+            inset 0 0 20px rgba(255, 255, 255, 0.8);
+        overflow: hidden;
+        position: relative;
     }
+
+    /* Decoration background */
+    .tag-cloud::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(
+            circle,
+            rgba(var(--accent), 0.1) 0%,
+            transparent 70%
+        );
+        border-radius: 50%;
+        z-index: 0;
+        pointer-events: none;
+    }
+
     .tag-cloud h3 {
-        margin: 0 0 1rem 0;
-        font-size: 1.1rem;
+        margin: 0 0 1.5rem 0;
+        font-size: 1.2rem;
         color: rgb(var(--black));
-        text-transform: uppercase;
+        font-weight: 800;
         letter-spacing: 0.05em;
-        border-bottom: 2px solid var(--glass-border);
-        padding-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    .tags {
+
+    .tag-cloud h3::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            rgba(var(--black), 0.1) 0%,
+            transparent 100%
+        );
+    }
+
+    .tags-grid {
         display: flex;
         flex-wrap: wrap;
         gap: 0.8rem;
-        align-items: baseline;
+        position: relative;
+        z-index: 1;
     }
-    .tag {
-        display: inline-flex;
+
+    .tag-card {
+        display: flex;
         align-items: center;
-        gap: 0.3em;
+        gap: 0.6rem;
+        padding: 0.6rem 1rem;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
         text-decoration: none;
         color: rgb(var(--gray-dark));
-        transition: color 0.2s ease;
-        line-height: 1;
+        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
-    .tag:hover {
-        color: var(--accent);
-        transform: translateY(-2px);
+
+    .tag-card:hover {
+        transform: translateY(-3px) scale(1.02);
+        background: #fff;
+        border-color: rgba(var(--accent), 0.3);
+        box-shadow:
+            0 8px 20px rgba(var(--accent), 0.15),
+            0 2px 5px rgba(0, 0, 0, 0.05);
+        color: rgb(var(--black));
     }
-    .count {
-        font-size: 0.7em;
-        opacity: 0.6;
-        margin-left: 2px;
+
+    .tag-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            120deg,
+            transparent 0%,
+            rgba(var(--accent), 0.05) 50%,
+            transparent 100%
+        );
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+    }
+
+    .tag-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .icon-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4em;
+        height: 1.4em;
+        transition: transform 0.3s ease;
+    }
+
+    .tag-card:hover .icon-box {
+        transform: scale(1.2) rotate(5deg);
+    }
+
+    .tag-count {
+        background: rgba(var(--gray), 0.1);
+        font-size: 0.75rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 20px;
+        color: rgb(var(--gray));
+        font-weight: 700;
+        min-width: 1.5em;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .tag-card:hover .tag-count {
+        background: var(--accent);
+        color: #fff;
     }
 </style>

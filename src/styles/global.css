@@ -392,6 +392,7 @@ hr {
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	-webkit-box-orient: vertical;
 	line-height: 1.5;
 }
@@ -445,4 +446,15 @@ hr {
 	.rlc-info {
 		padding: 1rem;
 	}
+}
+
+/* Math Display Overflow Handling */
+.katex-display,
+.MathJax_Display,
+math-display {
+	overflow-x: auto;
+	overflow-y: hidden;
+	max-width: 100%;
+	scrollbar-width: thin;
+	padding-bottom: 4px;
 }

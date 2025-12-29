@@ -29,7 +29,7 @@ export async function getStaticPaths() {
 	});
 	const uniqueCategories = [
 		...new Set(allPosts.map((post) => post.data.categories).flat()),
-	].filter(Boolean);
+	].filter((cat): cat is string => !!cat);
 
 	return uniqueCategories.map((category) => {
 		const filteredPosts = allPosts
@@ -86,16 +86,37 @@ const months = [
 			.container {
 				display: grid;
 				grid-template-columns: 1fr 240px;
+				grid-template-areas:
+					"main sidebar-top"
+					"main sidebar-bottom";
 				gap: 3rem;
+				align-items: start;
+			}
+
+			/* Main Content Area */
+			.content-area {
+				grid-area: main;
+			}
+
+			/* Sidebar Areas */
+			.sidebar-top {
+				grid-area: sidebar-top;
+			}
+
+			.sidebar-bottom {
+				grid-area: sidebar-bottom;
 			}
 
 			@media (max-width: 720px) {
 				.container {
 					grid-template-columns: 1fr;
+					grid-template-areas:
+						"sidebar-top"
+						"main"
+						"sidebar-bottom";
+					gap: 2rem;
 				}
-				aside {
-					order: -1;
-				}
+				/* Remove order: -1 as we use grid areas now */
 			}
 
 			ul {
@@ -172,7 +193,7 @@ const months = [
 		<Header />
 		<main>
 			<div class="container">
-				<section>
+				<section class="content-area">
 					<div class="page-header">
 						<h2>
 							Tech Stack: <span style="color: var(--accent);"
@@ -194,9 +215,11 @@ const months = [
 					</ul>
 				</section>
 
-				<aside>
+				<aside class="sidebar-top">
 					<TagCloud />
+				</aside>
 
+				<aside class="sidebar-bottom">
 					<div class="sidebar-section">
 						<h3>Archive</h3>
 						<ul class="archive-list">

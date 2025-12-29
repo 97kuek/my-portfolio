@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/BlogPost.astro"; // BlogPostレイアウトを使用
 import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.jpgをインポート
+import TechIcon from "../components/TechIcon.astro";
 ---
 
 <Layout
@@ -46,10 +47,22 @@ import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.
 			>
 				<h3>Languages</h3>
 				<div class="tags">
-					<span class="tag">Python</span>
-					<span class="tag">MATLAB</span>
-					<span class="tag">C / C++</span>
-					<span class="tag">SQL</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="Python" /></div>
+						Python
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="MATLAB" /></div>
+						MATLAB
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="C" /></div>
+						C / C++
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="SQL" /></div>
+						SQL
+					</span>
 				</div>
 			</div>
 
@@ -59,10 +72,24 @@ import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.
 			>
 				<h3>Engineering & Design</h3>
 				<div class="tags">
-					<span class="tag">Blender API</span>
-					<span class="tag">OpenCV</span>
-					<span class="tag">XFLR5</span>
-					<span class="tag">Fusion360</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="Blender" /></div>
+						Blender API
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="OpenCV" /></div>
+						OpenCV
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="XFLR5" /></div>
+						XFLR5
+					</span>
+					<span class="tag">
+						<div class="icon-box">
+							<TechIcon name="Fusion360" />
+						</div>
+						Fusion360
+					</span>
 				</div>
 			</div>
 
@@ -72,10 +99,22 @@ import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.
 			>
 				<h3>Web Development</h3>
 				<div class="tags">
-					<span class="tag">Astro</span>
-					<span class="tag">HTML/CSS</span>
-					<span class="tag">Git/GitHub</span>
-					<span class="tag">Next.js (Learning)</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="Astro" /></div>
+						Astro
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="HTML" /></div>
+						HTML/CSS
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="Git" /></div>
+						Git/GitHub
+					</span>
+					<span class="tag">
+						<div class="icon-box"><TechIcon name="Nextjs" /></div>
+						Next.js (Learning)
+					</span>
 				</div>
 			</div>
 		</div>
@@ -167,25 +206,44 @@ import aboutImg from "../assets/about.jpg"; // assetsフォルダにあるabout.
 	.tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.6rem;
+		gap: 0.8rem;
 	}
 	.tag {
-		background: var(--glass-bg);
-		color: rgb(var(--black));
-		padding: 0.4rem 1rem;
-		border-radius: 50px;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.5rem 0.9rem;
+		background: rgba(255, 255, 255, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.8);
+		border-radius: 12px;
+		color: rgb(var(--gray-dark));
+		font-weight: 600;
 		font-size: 0.9rem;
-		font-weight: 500;
-		border: 1px solid var(--glass-border);
-		transition: all 0.3s ease;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+		transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		cursor: default;
 	}
 	.tag:hover {
-		background: var(--accent);
-		color: #fff;
-		border-color: var(--accent);
-		transform: translateY(-3px);
-		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Glow effect */
+		transform: translateY(-3px) scale(1.02);
+		background: #fff;
+		border-color: rgba(var(--accent), 0.3);
+		box-shadow:
+			0 8px 20px rgba(var(--accent), 0.15),
+			0 2px 5px rgba(0, 0, 0, 0.05);
+		color: rgb(var(--black));
+	}
+
+	.icon-box {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.3em;
+		height: 1.3em;
+		transition: transform 0.3s ease;
+	}
+
+	.tag:hover .icon-box {
+		transform: scale(1.2) rotate(5deg);
 	}
 
 	/* --- タイムラインのデザイン --- */
